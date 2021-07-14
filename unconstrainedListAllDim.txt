@@ -2,7 +2,7 @@ DIXMAANI -- hand
 LIARWHD -- hand
 SCHMVETT -- hand
 LUKSAN13LS -- hand
-VAREIGVL -- hand
+VAREIGVL -- errors
 JUDGE -- hand
 CYCLOOCFLS -- hand
 DIXMAANJ -- hand
@@ -28,7 +28,7 @@ YATP1LS -- hand
 CERI651ELS -- hand
 GENHUMPS -- hand
 OSCIPATH -- done
-FLETCBV2 -- irregularities
+FLETCBV2
 DIXMAAND -- hand
 SISSER -- hand
 TRIGON1 -- hand
@@ -51,7 +51,7 @@ BOX -- done
 DMN37143LS -- hand
 TOINTGSS -- hand
 GAUSS3LS -- hand
-SPARSINE - errors
+SPARSINE
 VESUVIALS -- hand
 INTEQNELS -- hand
 COATINGNE -- hand
@@ -127,7 +127,7 @@ CHWIRUT2LS -- hand
 POWER -- done
 PENALTY2 -- hand
 DEVGLA2NE -- hand
-BA-L1SPLS
+BA-L1SPLS -- long
 BA-L73LS -- irregularities
 ALLINITU -- hand
 VESUVIOLS -- hand
@@ -152,7 +152,7 @@ BIGGS6 -- hand
 PALMER7C -- hand
 BEALE -- hand
 SROSENBR -- done
-MNISTS5LS
+MNISTS5LS -- long
 MGH10SLS -- hand
 ARGLINA -- hand
 INDEF -- hand
@@ -164,7 +164,7 @@ HELIX -- hand
 DIXON3DQ -- hand
 MEXHAT -- hand
 DENSCHNB -- hand
-MNISTS0LS
+MNISTS0LS -- long
 MGH09LS -- hand
 BDQRTIC -- hand
 DIXMAANH -- hand
@@ -179,7 +179,7 @@ DENSCHND -- hand
 BROWNBS -- hand
 SSI -- hand
 NCB20 -- hand
-FLETCBV3 -- irregularities
+FLETCBV3
 KSSLS -- hand
 CHAINWOO -- hand
 HATFLDE -- hand
@@ -205,7 +205,7 @@ DEVGLA1 -- hand
 HATFLDFL -- done
 OSCIGRAD -- done
 STREG -- hand
-FLETCHBV -- irregularities
+FLETCHBV
 AKIVA -- irregularities
 QING -- hand
 LANCZOS2LS -- hand
