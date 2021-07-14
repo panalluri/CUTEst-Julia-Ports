@@ -19366,6 +19366,7 @@ A["VESUVIALS"]=function vesuvials(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths place
 A["DMN15332LS"]=function dmn15332ls(x::AbstractVector)
     println("Julia port of CUTEST's DMN15332LS")
     grad = zeros(size(x))
@@ -28712,6 +28713,7 @@ A["DMN15332LS"]=function dmn15332ls(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths place
 A["DMN15102LS"]=function dmn15102ls(x::AbstractVector)
     println("Julia port of CUTEST's DMN15102LS")
     grad = zeros(size(x))
@@ -38059,6 +38061,7 @@ A["DMN15102LS"]=function dmn15102ls(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths place
 A["DMN15333LS"]=function dmn15333ls(x::AbstractVector)
     println("Julia port of CUTEST's DMN15333LS")
     grad = zeros(size(x))
@@ -47372,6 +47375,7 @@ A["DMN15333LS"]=function dmn15333ls(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths place
 A["DMN15103LS"]=function dmn15103ls(x::AbstractVector)
     println("Julia port of CUTEST's DMN15103LS")
     grad = zeros(size(x))
@@ -56684,6 +56688,7 @@ A["DMN15103LS"]=function dmn15103ls(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths place
 A["DMN37142LS"]=function dmn37142ls(x::AbstractVector)
     println("Julia port of CUTEST's DMN37142LS")
     grad = zeros(size(x))
@@ -66031,6 +66036,7 @@ A["DMN37142LS"]=function dmn37142ls(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths place
 A["DMN37143LS"]=function dmn37143ls(x::AbstractVector)
     println("Julia port of CUTEST's DMN37143LS")
     grad = zeros(size(x))
@@ -75883,6 +75889,7 @@ A["TOINTGOR"]=function tointgor(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths or thousanths place
 A["ENSOLS"]=function ensols(x::AbstractVector)
     println("Julia port of CUTEST's ENSOLS")
     grad = zeros(size(x))
