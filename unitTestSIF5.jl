@@ -1,13 +1,13 @@
-# module Wrapper
+module Wrapper
 
-# export wrapfun
+export wrapfun
 
-# using CUTEst
-# using NLPModels
+using CUTEst
+using NLPModels
 using SpecialFunctions
 
 A = Dict{String,Function}()
-B=Dict("FLETCBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>30,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>1667^2,"HYDCAR6LS"=>29,"SPINLS"=>2602,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
+B=Dict("LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETCHBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>30,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>1667^2,"HYDCAR6LS"=>29,"SPINLS"=>2602,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
 
 A["DIXON3DQ"]=function dixon3dq(x::AbstractVector)
     println("Julia port of CUTEST's DIXON3DQ")
@@ -31,9 +31,9 @@ A["CHAINWOO"]=function chainwoo(x::AbstractVector)
     sum=1
     j=4
     for i = 1:NS
-        A=x[j-2]+x[j-3]^2
+        A=x[j-2]-x[j-3]^2
         B=-x[j-3]+1
-        C=x[j]+x[j-1]^2
+        C=x[j]-x[j-1]^2
         D=-x[j-1]+1
         E=x[j-2]+x[j]-2
         F=x[j-2]-x[j]
@@ -1186,7 +1186,7 @@ A["YFITU"]=function yfitu(x::AbstractVector)
     y[16]=-32.042552
     y[17]=-35.747869
     for i = 1:(p+1)
-        term1 = -y[i]+x[3]*tan(x[1]*(1-i/p)+x[2]*i/p)
+        term1 = -y[i]+x[3]*tan(x[1]*(1-(i-1)/p)+x[2]*(i-1)/p)
         sum=sum+term1^2
     end
     return sum #, grad
@@ -1599,8 +1599,10 @@ A["NONCVXU2"]=function noncvxu2(x::AbstractVector)
     N=5000
     sum=0
     for i = 1:N
-        term1 = (x[i]+2*x[1])^2
-        term2 = 4*cos(x[i]+2*x[1])
+        # term1 = (x[i]+2*x[1])^2
+        # term2 = 4*cos(x[i]+2*x[1])
+        term1 = (x[i]+x[mod(3*i-2,N)+1]+x[mod(7*i-3,N)+1])^2
+        term2 = 4*cos(x[i]+x[mod(3*i-2,N)+1]+x[mod(7*i-3,N)+1])
         sum=sum+term1+term2
     end
     return sum #, grad
@@ -1830,7 +1832,7 @@ A["SSBRYBND"]=function ssbrybnd(x::AbstractVector)
     sum=0
     for i = 1:LB
         coeff = exp(6*(i-1)/(N-1))
-        sum1=K1*coeff*x[i]+K1*coeff^3*x[i]^3
+        sum1=K1*coeff*x[i]+K2*coeff^3*x[i]^3
         for j = 1:(i-1)
             coeff = exp(6*(j-1)/(N-1))
             term1 = -K3*coeff*x[j]-K3*coeff^2*x[j]^2
@@ -2154,6 +2156,7 @@ A["VAREIGVL"]=function vareigvl(x::AbstractVector)
     return sum #, grad
 end
 
+#issues when non-homogeneous input vector
 A["COOLHANSLS"]=function coolhansls(x::AbstractVector)
     println("Julia port of CUTEST's COOLHANSLS")
     grad = zeros(size(x))
@@ -2222,6 +2225,7 @@ A["COOLHANSLS"]=function coolhansls(x::AbstractVector)
     return sum #, grad
 end
 
+#somewhat close in homogeneous cases only
 A["FMINSRF2"]=function fminsrf2(x::AbstractVector)
     println("Julia port of CUTEST's FMINSRF2")
     grad = zeros(size(x))
@@ -2246,8 +2250,8 @@ A["FMINSRF2"]=function fminsrf2(x::AbstractVector)
             sum=sum+(1/SCALE)*sqrt(term1+term2+term3)
         end
     end
-    sum2 = 1/P^2*x[MID,MID]
-    sum=sum+sum2^2
+    sum2 = x[MID,MID]
+    sum=sum+1/(P^2)*sum2^2
     return sum #, grad
 end
 
@@ -2709,7 +2713,7 @@ A["SPINLS"]=function spinls(x::AbstractVector)
     return sum #, grad
 end
 
-#problems
+#vary somewhat with random vectors, but simpler vectors work wonderfully?
 A["HYDCAR6LS"]=function hydcar6ls(x::AbstractVector)
     println("Julia port of CUTEST's HYDCAR6LS")
     grad = zeros(size(x))
@@ -2720,7 +2724,7 @@ A["HYDCAR6LS"]=function hydcar6ls(x::AbstractVector)
     k=1
     t=zeros(N)
     x=zeros(N,M)
-    v=zeros(N)
+    v=zeros(N-1)
     for i=0:(N-1)
         t[i+1]=a[k]
         k=k+1
@@ -2781,71 +2785,110 @@ A["HYDCAR6LS"]=function hydcar6ls(x::AbstractVector)
     B1= 40
     D= 60
     Q= 2500000
-    for j =1:M
-        #2.1
-        E11J = -1 * x[2,j] * ( v[1] + B1 )
-        E12J = v[1]*x[1,j]*1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))
-        term1 = x[1,j]*B1+E11J+E12J
-        sum = sum + 10^(-4)*term1^2
-        #2.3
-        E31J = x[N-1,j]*(1 * 1 * exp(A[j] + (B[j] / (t[N-1] + C[j]))))
-        term2 = -x[N,j]+E31J
-        sum = sum + term2^2
-        #2.2
-        for i = 2:(N-1)
-            E21IJ = -1 * x[i+1,j] * ( v[i] + 1 )
-            E22IJ = v[i-1]*x[i-1,j]*-1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))
-            E23IJ=1 * x[i,j] * ( v[i-1] + 1 )
-            E24IJ = v[i]*x[i,j]*1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))
-            term2 = E21IJ+E22IJ+E23IJ+E24IJ
-            if i==2
-                term2=term2-FL[j]
-            elseif i==3
-                term2=term2-FV[j]
-            end
-            sum = sum+ 10^(-4)*term2^2
-        end
+    E11=zeros(M)
+    E12=zeros(M)
+    E31=zeros(M)
+    E81=zeros(M)
+    E82=zeros(M)
+    E83=zeros(M)
+    E21=zeros(N-2,M)
+    E22=zeros(N-2,M)
+    E23=zeros(N-2,M)
+    E24=zeros(N-2,M)
+    E91=zeros(N-2,M)
+    E92=zeros(N-2,M)
+    E93=zeros(N-2,M)
+    E94=zeros(N-2,M)
+    E71=zeros(N,M)
+    M21=zeros(M)
+    M23=zeros(M)
+    M22=zeros(N-2,M)
+    M27=ones(N)
+    M27=-1*M27
+    M28=-Q
+    M29=zeros(N-2)
+    SHF=0
+    BHF=0
+    for j=1:M
+        M22[2,j]=-FL[j]
+        M22[3,j]=-FV[j]
+        temp1=AL2[j]*TF^2
+        temp2=AL1[j]*TF
+        temp1=temp1+temp2+AL[j]
+        SHF=SHF+temp1*FL[j]
+        temp1=BE2[j]*TF^2
+        temp2=BE1[j]*TF
+        temp1=temp1+temp2+BE[j]
+        BHF=BHF+temp1*FV[j]
     end
-    #2.7
-    for i = 1:(N)
-        sum1=0
-        for j =1:M
-        E71IJ = x[i,j]*(1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j]))))
-        term3 = -1+E71IJ
-        sum1=sum1+term3
-        end
-        sum=sum+sum1^2
-    end
-    #2.8
-    term4=0
+    M29[2]=-SHF
+    M29[3]=-BHF
     for j = 1:M
-        E81J = 1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))*v[1] * x[1,j]*(BE[j] + BE1[j] * t[1] + BE2[j] * t[1] * t[1])
-        E82J = B1*x[1,j]*(AL[j] + AL1[j] * t[1] + AL2[j] * t[1] * t[1])
-        E83J = -1 * x[2,j] * ( 1 + v[1] )*(AL[j] + AL1[j] * t[1] + AL2[j] * t[2] * t[2])
-        term4 = term4-Q+E81J+E82J+E83J
+        E11[j]=-x[2,j]*(v[1]+B1)
+        E12[j]=v[1]*x[1,j]*1*1*exp(A[j]+(B[j]/(t[1]+C[j])))
+        for i=1:(N-2)
+            E21[1,j]=-x[i+2,j]*(v[i+1]+B1)
+            E21[2,j]=-x[i+2,j]*(v[i+1]-D)
+            E21[3,j]=-x[i+2,j]*(v[i+1]-D)
+            E21[4,j]=-x[i+2,j]*(v[i+1]-D)
+            E22[i,j]=v[i]*x[i,j]*-1*1*exp(A[j]+(B[j]/(t[i]+C[j])))
+            E23[1,j]=x[i+1,j]*(v[i]+B1)
+            E23[2,j]=x[i+1,j]*(v[i]+B1)
+            E23[3,j]=x[i+1,j]*(v[i]-D)
+            E23[4,j]=x[i+1,j]*(v[i]-D)
+            E24[i,j]=v[i+1]*x[i+1,j]*1*1*exp(A[j]+(B[j]/(t[i+1]+C[j])))
+        end
+        E31[j]=x[N-1,j]*(1*1*exp(A[j]+(B[j]/(t[N-1]+C[j]))))
     end
-    sum = sum+10^(-10)*term4^2
-    #2.9
-    for i = 2:(N-1)
-        sum1=0
-        SHF=0
-        BHF=0
-        for j = 1:M
-        E91IJ = 1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))*v[i] * x[i,j]*(BE[j] + BE1[j] * t[i] + BE2[j] * t[i] * t[i])
-        E92IJ = 1 * x[i,j] * ( 1 + v[i-1] ) *(AL[j] + AL1[j] * t[i] + AL2[j] * t[i] * t[i])
-        E93IJ = -1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))*v[i-1] * x[i-1,j]*(BE[j] + BE1[j] * t[i-1] + BE2[j] * t[i-1] * t[i-1])
-        E94IJ = -1 * x[i+1,j] * ( 1 + v[i] ) *(AL[j] + AL1[j] * t[i+1] + AL2[j] * t[i+1] * t[i+1])
-        term5 = E91IJ+E92IJ+E93IJ+E94IJ
-        SHF= SHF+FL[j]*(AL[j]+TF^2*AL2[j]+TF*AL1[j])
-        BHF= BHF+FV[j]*(BE[j]+TF^2*BE2[j]+TF*BE1[j])
-        sum1=sum1+term5
+    for j=1:M
+        for i=0:(N-1)
+            E71[i+1,j]=x[i+1,j]*(1*1*exp(A[j]+(B[j]/(t[i+1]+C[j]))))
         end
-        if i==2
-            sum1=sum1-SHF
-        elseif i==3
-            sum1=sum1-BHF
+    end
+    for j=1:M
+        E81[j]=v[1]*x[1,j]*(1*1*exp(A[j]+(B[j]/(t[1]+C[j]))))*(BE[j]+BE1[j]*t[1]+BE2[j]*t[1]*t[1])
+        E82[j]=B1*x[1,j]*(AL[j]+AL1[j]*t[1]+AL2[j]*t[1]*t[1])
+        E83[j]=-1*x[2,j]*(B1+v[1])*(AL[j]+AL1[j]*t[2]+AL2[j]*t[2]*t[2])
+        for i=1:(N-2)
+            E91[i,j]=v[i+1]*x[i+1,j]*(1*1*exp(A[j]+(B[j]/(t[i+1]+C[j]))))*(BE[j]+BE1[j]*t[i+1]+BE2[j]*t[i+1]*t[i+1])
+            E92[1,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E92[2,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E92[3,j]=1*x[i+1,j]*(-D+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E92[4,j]=1*x[i+1,j]*(-D+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E93[i,j]=v[i]*x[i,j]*(-1*1*exp(A[j]+(B[j]/(t[i]+C[j]))))*(BE[j]+BE1[j]*t[i]+BE2[j]*t[i]*t[i])
+            E94[1,j]=-1*x[i+2,j]*(B1+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+            E94[2,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+            E94[3,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+            E94[4,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
         end
-        sum = sum+10^(-10)*sum1^2
+    end
+    for j=1:M
+        M21[j]=M21[j]+E11[j]+E12[j]
+        M23[j]=M23[j]+E31[j]
+        M28=M28+E81[j]+E82[j]+E83[j]
+        for i=1:(N-2)
+            M22[i,j]=M22[i,j]+E21[i,j]+E22[i,j]+E23[i,j]+E24[i,j]
+            M29[i]=M29[i]+E91[i,j]+E92[i,j]+E93[i,j]+E94[i,j]
+        end
+        for i=0:(N-1)
+            M27[i+1]=M27[i+1]+E71[i+1,j]
+        end
+    end
+    for j=1:M
+        sum=sum+10^(-4)*(M21[j]+B1*x[1,j])^2
+        sum=sum+(-x[N,j]+M23[j])^2
+    end
+    for j=1:M
+        for i=1:(N-2)
+            sum=sum+10^(-4)*M22[i,j]^2
+        end
+    end
+    for i=1:N
+        sum=sum+M27[i]^2
+    end
+    sum=sum+10^(-10)*M28^2
+    for i=1:(N-2)
+        sum=sum+10^(-10)*M29[i]^2
     end
     return sum #, grad
 end
@@ -3324,7 +3367,6 @@ A["LANCZOS2LS"]=function lanczos2ls(x::AbstractVector)
     return sum #, grad
 end
 
-#problems
 A["MSQRTBLS"]=function msqrtbls(x::AbstractVector)
     println("Julia port of CUTEST's MSQRTBLS")
     grad = zeros(size(x))
@@ -3334,7 +3376,7 @@ A["MSQRTBLS"]=function msqrtbls(x::AbstractVector)
     a=x
     x=zeros(P,P)
     for i =1:P
-        x[1,1:P]=a[1+(i-1)*P:i*P]
+        x[i,1:P]=a[1+(i-1)*P:i*P]
     end
     #CONSTZ
     B =zeros(P,P)
@@ -4411,7 +4453,6 @@ A["STREG"]=function streg(x::AbstractVector)
     return sum #, grad
 end
 
-#run tests from here down
 A["FLETCBV2"]=function fletcbv2(x::AbstractVector)
     println("Julia port of CUTEST's FLETCBV2")
     grad = zeros(size(x))
@@ -4441,7 +4482,7 @@ A["SPARSINE"]=function sparsine(x::AbstractVector)
     N=5000
     sum=0
     for i =1:(N)
-        OBJ = x[i]+5*sin(x[1])
+        OBJ = sin(x[i])+sin(x[mod(2*i-1,N)+1])+sin(x[mod(3*i-1,N)+1])+sin(x[mod(5*i-1,N)+1])+sin(x[mod(7*i-1,N)+1])+sin(x[mod(11*i-1,N)+1])
         sum=sum+0.5*i*OBJ^2
     end
     return sum #, grad
@@ -4455,18 +4496,18 @@ A["FLETCBV3"]=function fletcbv3(x::AbstractVector)
     OBJ=10^8
     H=1/(N+1)
     G0=x[1]
-    sum=0.5*G0^2
     P=1/OBJ
+    sum=0.5*G0^2*P
     for i =1:(N-1)
         G = x[i]-x[i+1]
-        L=x[i]*P*(-1-2*H^2)
-        sum=sum+0.5*(G)^2+L
+        sum=sum+0.5*P*(G)^2
     end
-    GN=0.5*x[N]^2
+    GN=0.5*x[N]^2*P
     sum=sum+GN
     for i=1:(N)
-        C = -K/H^2*P*cos(x[i])
-        sum=sum+C
+        C = -K*(N+1)^2*P*cos(x[i])
+        L=x[i]*P*(1+2*(N+1)^2)
+        sum=sum+C+L
     end
     return sum #, grad
 end
@@ -4501,15 +4542,15 @@ A["LUKSAN15LS"]=function luksan15ls(x::AbstractVector)
         i=0
         for j = 1:S
             for l=1:4
-                PLI=1/(P*l)
-                P2OL = P^2/l
+                PLI=1/(p*l)
+                P2OL = p^2/l
                 P=x[i+1]*(x[i+2]^2)*x[i+3]^3*x[i+4]^4
                 if P>0
                     P=P
                 else
                     P=-P
                 end
-                E[k,p]=P2OL*P^PLI
+                F[k,p]=P2OL*P^PLI
                 k=k+1
             end
             i=i+2
@@ -4547,16 +4588,16 @@ A["LUKSAN17LS"]=function luksan17ls(x::AbstractVector)
         k=k+1
     end
     C=zeros(M,M)
-    S=zeros(M,M)
+    Si=zeros(M,M)
     for q=1:4
         k=1
         i=0
         for j=1:S
             for l=1:4
                 A=-l*q^2
-                S[k,q]=A*sin(x[i+q])
+                Si[k,q]=Si[k,q]+A*sin(x[i+q])
                 A=l^2*q
-                C[k,q]=A*cos(x[i+q])
+                C[k,q]=C[k,q]+A*cos(x[i+q])
                 k=k+1
             end
             i=i+2
@@ -4564,9 +4605,9 @@ A["LUKSAN17LS"]=function luksan17ls(x::AbstractVector)
     end
     for g=1:M
         for q=1:4
-        E[q]=E[q]+S[k,q]+C[k,q]
-        sum=sum+E[q]^2
+        E[g]=E[g]+Si[g,q]+C[g,q]
         end
+        sum=sum+E[g]^2
     end
     return sum #, grad
 end
@@ -4580,7 +4621,7 @@ A["LUKSAN11LS"]=function luksan11ls(x::AbstractVector)
     sum=0
     E=zeros(M)
     k=1
-    for j=1:S
+    for i=1:S
         E[k]=-10*x[i+1]
         k=k+1
         E[k]=x[i]
@@ -4630,9 +4671,10 @@ A["LUKSAN16LS"]=function luksan16ls(x::AbstractVector)
         i=0
         for j=1:S
             for l=1:4
-                P2OL=P^2*l
-                PLI=1/(P*l)
-                C[k,q] = x[i+1]+2*x[i+2]+3*x[i+3]+4*x[i+4]
+                P2OL=q^2/l
+                PLI=1/(q*l)
+                term = x[i+1]+2*x[i+2]+3*x[i+3]+4*x[i+4]
+                C[k,q] = P2OL*exp(PLI*term)
                 k=k+1
             end
             i=i+2
@@ -4645,8 +4687,8 @@ A["LUKSAN16LS"]=function luksan16ls(x::AbstractVector)
     return sum #, grad
 end
 
-A["FLETCBV"]=function fletcbv(x::AbstractVector)
-    println("Julia port of CUTEST's FLETCBV")
+A["FLETCHBV"]=function fletchbv(x::AbstractVector)
+    println("Julia port of CUTEST's FLETCHBV")
     grad = zeros(size(x))
     N=5000
     K=1
@@ -4657,10 +4699,10 @@ A["FLETCBV"]=function fletcbv(x::AbstractVector)
     P=1/OBJ
     for i =1:(N-1)
         G = x[i]-x[i+1]
-        L=x[i]*(-2*H^2)
+        L=x[i]*(-2/H^2)
         sum=sum+0.5*(G)^2+L
     end
-    LN=x[N]*(-1-2*H^2)
+    LN=x[N]*(2/H^2)
     GN=0.5*x[N]^2
     sum=sum+GN+LN
     for i=1:(N)
@@ -4670,19 +4712,19 @@ A["FLETCBV"]=function fletcbv(x::AbstractVector)
     return sum #, grad
 end
 
-#fix code, base off hydcar6ls
+#vary somewhat with random vectors, but simpler vectors work wonderfully?
 A["METHANB8LS"]=function methanb8ls(x::AbstractVector)
     println("Julia port of CUTEST's METHANB8LS")
     grad = zeros(size(x))
     sum=0
     M=2
     N=8
-    K=2
     a=x
+    K=2
     k=1
     t=zeros(N)
     x=zeros(N,M)
-    v=zeros(N)
+    v=zeros(N-1)
     for i=0:(N-1)
         t[i+1]=a[k]
         k=k+1
@@ -4706,13 +4748,13 @@ A["METHANB8LS"]=function methanb8ls(x::AbstractVector)
     BE2=zeros(3)
     FL=zeros(3)
     FV=zeros(3)
-    PI=zeros(8)
-    A[1]= 18.5751
-    B[1]= -3632.649
-    C[1]= 239.2
-    A[2]= 18.3443
-    B[2]= -3841.2203
-    C[2]= 228.0
+    PI=zeros(N)
+    A[1]=18.5751
+    B[1]=-3632.649
+    C[1]=239.2
+    A[2]=18.3443
+    B[2]=-3841.2203
+    C[2]=228.0
     AL[1]=0.0
     AL1[1]=15.97
     AL2[1]=0.0422
@@ -4729,10 +4771,10 @@ A["METHANB8LS"]=function methanb8ls(x::AbstractVector)
     FL[2]=684.25
     FV[1]=0.0
     FV[2]=0.0
-    TF= 89.0
-    B1=  693.37
-    D=  442.13
-    Q=  8386200.0
+    TF=89.0
+    B1= 693.37
+    D= 442.13
+    Q= 8386200.0
     PI[1]=1210.0
     PI[2]=1200.0
     PI[3]=1190.0
@@ -4741,87 +4783,131 @@ A["METHANB8LS"]=function methanb8ls(x::AbstractVector)
     PI[6]=1160.0
     PI[7]=1150.0
     PI[8]=1140.0
-    for j =1:M
-        #2.1
-        E11J = -1 * x[2,j] * ( v[1] + B1 )
-        E12J = v[1]*x[1,j]*1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))
-        term1 = x[1,j]*B1+E11J+E12J
-        sum = sum + 10^(-4)*term1^2
-        #2.3
-        E31J = x[N-1,j]*(1 * 1 * exp(A[j] + (B[j] / (t[N-1] + C[j]))))
-        term2 = -x[N,j]+E31J
-        sum = sum + term2^2
-        #2.2
-        for i = 2:(N-1)
-            E21IJ = -1 * x[i+1,j] * ( v[i] + 1 )
-            E22IJ = v[i-1]*x[i-1,j]*-1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))
-            E23IJ=1 * x[i,j] * ( v[i-1] + 1 )
-            E24IJ = v[i]*x[i,j]*1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))
-            term2 = E21IJ+E22IJ+E23IJ+E24IJ
-            if i==2
-                term2=term2-FL[j]
-            elseif i==3
-                term2=term2-FV[j]
-            end
-            sum = sum+ 10^(-4)*term2^2
-        end
+    E11=zeros(M)
+    E12=zeros(M)
+    E31=zeros(M)
+    E81=zeros(M)
+    E82=zeros(M)
+    E83=zeros(M)
+    E21=zeros(N-2,M)
+    E22=zeros(N-2,M)
+    E23=zeros(N-2,M)
+    E24=zeros(N-2,M)
+    E91=zeros(N-2,M)
+    E92=zeros(N-2,M)
+    E93=zeros(N-2,M)
+    E94=zeros(N-2,M)
+    E71=zeros(N,M)
+    M21=zeros(M)
+    M23=zeros(M)
+    M22=zeros(N-2,M)
+    M27=ones(N)
+    M27=-1*M27
+    M28=-Q
+    M29=zeros(N-2)
+    SHF=0
+    BHF=0
+    for j=1:M
+        M22[K,j]=-FL[j]
+        M22[K+1,j]=-FV[j]
+        temp1=AL2[j]*TF^2
+        temp2=AL1[j]*TF
+        temp1=temp1+temp2+AL[j]
+        SHF=SHF+temp1*FL[j]
+        temp1=BE2[j]*TF^2
+        temp2=BE1[j]*TF
+        temp1=temp1+temp2+BE[j]
+        BHF=BHF+temp1*FV[j]
     end
-    #2.7
-    for i = 1:(N)
-        sum1=0
-        for j =1:M
-        E71IJ = x[i,j]*(1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j]))))
-        term3 = -1+E71IJ
-        sum1=sum1+term3
-        end
-        sum=sum+sum1^2
-    end
-    #2.8
-    term4=0
+    M29[K]=-SHF
+    M29[K+1]=-BHF
     for j = 1:M
-        E81J = 1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))*v[1] * x[1,j]*(BE[j] + BE1[j] * t[1] + BE2[j] * t[1] * t[1])
-        E82J = B1*x[1,j]*(AL[j] + AL1[j] * t[1] + AL2[j] * t[1] * t[1])
-        E83J = -1 * x[2,j] * ( 1 + v[1] )*(AL[j] + AL1[j] * t[1] + AL2[j] * t[2] * t[2])
-        term4 = term4-Q+E81J+E82J+E83J
+        E11[j]=-x[2,j]*(v[1]+B1)
+        E12[j]=v[1]*x[1,j]*1*(1/PI[1])*exp(A[j]+(B[j]/(t[1]+C[j])))
+        for i=1:(N-2)
+            E22[i,j]=v[i]*x[i,j]*-1*(1/PI[i])*exp(A[j]+(B[j]/(t[i]+C[j])))
+            E21[K,j]=-x[i+2,j]*(v[i+1]-D)
+            E23[K,j]=x[i+1,j]*(v[i]+B1)
+            E24[i,j]=v[i+1]*x[i+1,j]*1*(1/PI[i+1])*exp(A[j]+(B[j]/(t[i+1]+C[j])))
+        end
+        for i =1:(K-1)
+            E21[i,j]=-x[i+2,j]*(v[i+1]+B1)
+            E23[i,j]=x[i+1,j]*(v[i]+B1)
+        end
+        for i =(K+1):(N-2)
+            E21[i,j]=-x[i+2,j]*(v[i+1]-D)
+            E23[i,j]=x[i+1,j]*(v[i]-D)
+        end
+        E31[j]=x[N-1,j]*(1*(1/PI[N-1])*exp(A[j]+(B[j]/(t[N-1]+C[j]))))
     end
-    sum = sum+10^(-10)*term4^2
-    #2.9
-    for i = 2:(N-1)
-        sum1=0
-        SHF=0
-        BHF=0
-        for j = 1:M
-        E91IJ = 1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))*v[i] * x[i,j]*(BE[j] + BE1[j] * t[i] + BE2[j] * t[i] * t[i])
-        E92IJ = 1 * x[i,j] * ( 1 + v[i-1] ) *(AL[j] + AL1[j] * t[i] + AL2[j] * t[i] * t[i])
-        E93IJ = -1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))*v[i-1] * x[i-1,j]*(BE[j] + BE1[j] * t[i-1] + BE2[j] * t[i-1] * t[i-1])
-        E94IJ = -1 * x[i+1,j] * ( 1 + v[i] ) *(AL[j] + AL1[j] * t[i+1] + AL2[j] * t[i+1] * t[i+1])
-        term5 = E91IJ+E92IJ+E93IJ+E94IJ
-        SHF= SHF+FL[j]*(AL[j]+TF^2*AL2[j]+TF*AL1[j])
-        BHF= BHF+FV[j]*(BE[j]+TF^2*BE2[j]+TF*BE1[j])
-        sum1=sum1+term5
+    for j=1:M
+        for i=0:(N-1)
+            E71[i+1,j]=x[i+1,j]*(1*(1/PI[i+1])*exp(A[j]+(B[j]/(t[i+1]+C[j]))))
         end
-        if i==2
-            sum1=sum1-SHF
-        elseif i==3
-            sum1=sum1-BHF
+    end
+    for j=1:M
+        E81[j]=v[1]*x[1,j]*(1*(1/PI[1])*exp(A[j]+(B[j]/(t[1]+C[j]))))*(BE[j]+BE1[j]*t[1]+BE2[j]*t[1]*t[1])
+        E82[j]=B1*x[1,j]*(AL[j]+AL1[j]*t[1]+AL2[j]*t[1]*t[1])
+        E83[j]=-1*x[2,j]*(B1+v[1])*(AL[j]+AL1[j]*t[2]+AL2[j]*t[2]*t[2])
+        for i=1:(N-2)
+            E91[i,j]=v[i+1]*x[i+1,j]*(1*(1/PI[i+1])*exp(A[j]+(B[j]/(t[i+1]+C[j]))))*(BE[j]+BE1[j]*t[i+1]+BE2[j]*t[i+1]*t[i+1])
+            E92[K,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[K,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+            E93[i,j]=v[i]*x[i,j]*(-1*(1/PI[i])*exp(A[j]+(B[j]/(t[i]+C[j]))))*(BE[j]+BE1[j]*t[i]+BE2[j]*t[i]*t[i])
         end
-        sum = sum+10^(-10)*sum1^2
+        for i=1:(K-1)
+            E92[i,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[i,j]=-1*x[i+2,j]*(B1+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+        end
+        for i=(K+1):(N-2)
+            E92[i,j]=1*x[i+1,j]*(-D+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[i,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+        end
+    end
+    for j=1:M
+        M21[j]=M21[j]+E11[j]+E12[j]
+        M23[j]=M23[j]+E31[j]
+        M28=M28+E81[j]+E82[j]+E83[j]
+        for i=1:(N-2)
+            M22[i,j]=M22[i,j]+E21[i,j]+E22[i,j]+E23[i,j]+E24[i,j]
+            M29[i]=M29[i]+E91[i,j]+E92[i,j]+E93[i,j]+E94[i,j]
+        end
+        for i=0:(N-1)
+            M27[i+1]=M27[i+1]+E71[i+1,j]
+        end
+    end
+    for j=1:M
+        sum=sum+10^(-4)*(M21[j]+B1*x[1,j])^2
+        sum=sum+(-x[N,j]+M23[j])^2
+    end
+    for j=1:M
+        for i=1:(N-2)
+            sum=sum+10^(-4)*M22[i,j]^2
+        end
+    end
+    for i=1:N
+        sum=sum+M27[i]^2
+    end
+    sum=sum+10^(-10)*M28^2
+    for i=1:(N-2)
+        sum=sum+10^(-10)*M29[i]^2
     end
     return sum #, grad
 end
 
-#fix constants, fix code, base off hydcar6ls
+#vary somewhat with random vectors, but simpler vectors work wonderfully?
 A["HYDC20LS"]=function hydc20ls(x::AbstractVector)
     println("Julia port of CUTEST's HYDC20LS")
     grad = zeros(size(x))
     sum=0
     M=3
-    N=6
+    N=20
     a=x
+    K=9
     k=1
     t=zeros(N)
     x=zeros(N,M)
-    v=zeros(N)
+    v=zeros(N-1)
     for i=0:(N-1)
         t[i+1]=a[k]
         k=k+1
@@ -4882,88 +4968,131 @@ A["HYDC20LS"]=function hydc20ls(x::AbstractVector)
     B1= 40
     D= 60
     Q= 2500000
-    for j =1:M
-        #2.1
-        E11J = -1 * x[2,j] * ( v[1] + B1 )
-        E12J = v[1]*x[1,j]*1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))
-        term1 = x[1,j]*B1+E11J+E12J
-        sum = sum + 10^(-4)*term1^2
-        #2.3
-        E31J = x[N-1,j]*(1 * 1 * exp(A[j] + (B[j] / (t[N-1] + C[j]))))
-        term2 = -x[N,j]+E31J
-        sum = sum + term2^2
-        #2.2
-        for i = 2:(N-1)
-            E21IJ = -1 * x[i+1,j] * ( v[i] + 1 )
-            E22IJ = v[i-1]*x[i-1,j]*-1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))
-            E23IJ=1 * x[i,j] * ( v[i-1] + 1 )
-            E24IJ = v[i]*x[i,j]*1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))
-            term2 = E21IJ+E22IJ+E23IJ+E24IJ
-            if i==2
-                term2=term2-FL[j]
-            elseif i==3
-                term2=term2-FV[j]
-            end
-            sum = sum+ 10^(-4)*term2^2
-        end
+    E11=zeros(M)
+    E12=zeros(M)
+    E31=zeros(M)
+    E81=zeros(M)
+    E82=zeros(M)
+    E83=zeros(M)
+    E21=zeros(N-2,M)
+    E22=zeros(N-2,M)
+    E23=zeros(N-2,M)
+    E24=zeros(N-2,M)
+    E91=zeros(N-2,M)
+    E92=zeros(N-2,M)
+    E93=zeros(N-2,M)
+    E94=zeros(N-2,M)
+    E71=zeros(N,M)
+    M21=zeros(M)
+    M23=zeros(M)
+    M22=zeros(N-2,M)
+    M27=ones(N)
+    M27=-1*M27
+    M28=-Q
+    M29=zeros(N-2)
+    SHF=0
+    BHF=0
+    for j=1:M
+        M22[K,j]=-FL[j]
+        M22[K+1,j]=-FV[j]
+        temp1=AL2[j]*TF^2
+        temp2=AL1[j]*TF
+        temp1=temp1+temp2+AL[j]
+        SHF=SHF+temp1*FL[j]
+        temp1=BE2[j]*TF^2
+        temp2=BE1[j]*TF
+        temp1=temp1+temp2+BE[j]
+        BHF=BHF+temp1*FV[j]
     end
-    #2.7
-    for i = 1:(N)
-        sum1=0
-        for j =1:M
-        E71IJ = x[i,j]*(1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j]))))
-        term3 = -1+E71IJ
-        sum1=sum1+term3
-        end
-        sum=sum+sum1^2
-    end
-    #2.8
-    term4=0
+    M29[K]=-SHF
+    M29[K+1]=-BHF
     for j = 1:M
-        E81J = 1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))*v[1] * x[1,j]*(BE[j] + BE1[j] * t[1] + BE2[j] * t[1] * t[1])
-        E82J = B1*x[1,j]*(AL[j] + AL1[j] * t[1] + AL2[j] * t[1] * t[1])
-        E83J = -1 * x[2,j] * ( 1 + v[1] )*(AL[j] + AL1[j] * t[1] + AL2[j] * t[2] * t[2])
-        term4 = term4-Q+E81J+E82J+E83J
+        E11[j]=-x[2,j]*(v[1]+B1)
+        E12[j]=v[1]*x[1,j]*1*1*exp(A[j]+(B[j]/(t[1]+C[j])))
+        for i=1:(N-2)
+            E22[i,j]=v[i]*x[i,j]*-1*1*exp(A[j]+(B[j]/(t[i]+C[j])))
+            E21[K,j]=-x[i+2,j]*(v[i+1]-D)
+            E23[K,j]=x[i+1,j]*(v[i]+B1)
+            E24[i,j]=v[i+1]*x[i+1,j]*1*1*exp(A[j]+(B[j]/(t[i+1]+C[j])))
+        end
+        for i =1:(K-1)
+            E21[i,j]=-x[i+2,j]*(v[i+1]+B1)
+            E23[i,j]=x[i+1,j]*(v[i]+B1)
+        end
+        for i =(K+1):(N-2)
+            E21[i,j]=-x[i+2,j]*(v[i+1]-D)
+            E23[i,j]=x[i+1,j]*(v[i]-D)
+        end
+        E31[j]=x[N-1,j]*(1*1*exp(A[j]+(B[j]/(t[N-1]+C[j]))))
     end
-    sum = sum+10^(-10)*term4^2
-    #2.9
-    for i = 2:(N-1)
-        sum1=0
-        SHF=0
-        BHF=0
-        for j = 1:M
-        E91IJ = 1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))*v[i] * x[i,j]*(BE[j] + BE1[j] * t[i] + BE2[j] * t[i] * t[i])
-        E92IJ = 1 * x[i,j] * ( 1 + v[i-1] ) *(AL[j] + AL1[j] * t[i] + AL2[j] * t[i] * t[i])
-        E93IJ = -1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))*v[i-1] * x[i-1,j]*(BE[j] + BE1[j] * t[i-1] + BE2[j] * t[i-1] * t[i-1])
-        E94IJ = -1 * x[i+1,j] * ( 1 + v[i] ) *(AL[j] + AL1[j] * t[i+1] + AL2[j] * t[i+1] * t[i+1])
-        term5 = E91IJ+E92IJ+E93IJ+E94IJ
-        SHF= SHF+FL[j]*(AL[j]+TF^2*AL2[j]+TF*AL1[j])
-        BHF= BHF+FV[j]*(BE[j]+TF^2*BE2[j]+TF*BE1[j])
-        sum1=sum1+term5
+    for j=1:M
+        for i=0:(N-1)
+            E71[i+1,j]=x[i+1,j]*(1*1*exp(A[j]+(B[j]/(t[i+1]+C[j]))))
         end
-        if i==2
-            sum1=sum1-SHF
-        elseif i==3
-            sum1=sum1-BHF
+    end
+    for j=1:M
+        E81[j]=v[1]*x[1,j]*(1*1*exp(A[j]+(B[j]/(t[1]+C[j]))))*(BE[j]+BE1[j]*t[1]+BE2[j]*t[1]*t[1])
+        E82[j]=B1*x[1,j]*(AL[j]+AL1[j]*t[1]+AL2[j]*t[1]*t[1])
+        E83[j]=-1*x[2,j]*(B1+v[1])*(AL[j]+AL1[j]*t[2]+AL2[j]*t[2]*t[2])
+        for i=1:(N-2)
+            E91[i,j]=v[i+1]*x[i+1,j]*(1*1*exp(A[j]+(B[j]/(t[i+1]+C[j]))))*(BE[j]+BE1[j]*t[i+1]+BE2[j]*t[i+1]*t[i+1])
+            E92[K,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[K,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+            E93[i,j]=v[i]*x[i,j]*(-1*1*exp(A[j]+(B[j]/(t[i]+C[j]))))*(BE[j]+BE1[j]*t[i]+BE2[j]*t[i]*t[i])
         end
-        sum = sum+10^(-10)*sum1^2
+        for i=1:(K-1)
+            E92[i,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[i,j]=-1*x[i+2,j]*(B1+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+        end
+        for i=(K+1):(N-2)
+            E92[i,j]=1*x[i+1,j]*(-D+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[i,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+        end
+    end
+    for j=1:M
+        M21[j]=M21[j]+E11[j]+E12[j]
+        M23[j]=M23[j]+E31[j]
+        M28=M28+E81[j]+E82[j]+E83[j]
+        for i=1:(N-2)
+            M22[i,j]=M22[i,j]+E21[i,j]+E22[i,j]+E23[i,j]+E24[i,j]
+            M29[i]=M29[i]+E91[i,j]+E92[i,j]+E93[i,j]+E94[i,j]
+        end
+        for i=0:(N-1)
+            M27[i+1]=M27[i+1]+E71[i+1,j]
+        end
+    end
+    for j=1:M
+        sum=sum+10^(-4)*(M21[j]+B1*x[1,j])^2
+        sum=sum+(-x[N,j]+M23[j])^2
+    end
+    for j=1:M
+        for i=1:(N-2)
+            sum=sum+10^(-4)*M22[i,j]^2
+        end
+    end
+    for i=1:N
+        sum=sum+M27[i]^2
+    end
+    sum=sum+10^(-10)*M28^2
+    for i=1:(N-2)
+        sum=sum+10^(-10)*M29[i]^2
     end
     return sum #, grad
 end
 
-#fix constants, fix code, base off hydcar6ls
+#vary somewhat with random vectors, but simpler vectors work wonderfully?
 A["METHANL8LS"]=function methanl8ls(x::AbstractVector)
     println("Julia port of CUTEST's METHANL8LS")
     grad = zeros(size(x))
     sum=0
     M=2
     N=8
-    K=2
     a=x
+    K=2
     k=1
     t=zeros(N)
     x=zeros(N,M)
-    v=zeros(N)
+    v=zeros(N-1)
     for i=0:(N-1)
         t[i+1]=a[k]
         k=k+1
@@ -4987,13 +5116,13 @@ A["METHANL8LS"]=function methanl8ls(x::AbstractVector)
     BE2=zeros(3)
     FL=zeros(3)
     FV=zeros(3)
-    PI=zeros(8)
-    A[1]= 18.5751
-    B[1]= -3632.649
-    C[1]= 239.2
-    A[2]= 18.3443
-    B[2]= -3841.2203
-    C[2]= 228.0
+    PI=zeros(N)
+    A[1]=18.5751
+    B[1]=-3632.649
+    C[1]=239.2
+    A[2]=18.3443
+    B[2]=-3841.2203
+    C[2]=228.0
     AL[1]=0.0
     AL1[1]=15.97
     AL2[1]=0.0422
@@ -5010,10 +5139,10 @@ A["METHANL8LS"]=function methanl8ls(x::AbstractVector)
     FL[2]=684.25
     FV[1]=0.0
     FV[2]=0.0
-    TF= 89.0
-    B1=  693.37
-    D=  442.13
-    Q=  8386200.0
+    TF=89.0
+    B1= 693.37
+    D= 442.13
+    Q= 8386200.0
     PI[1]=1210.0
     PI[2]=1200.0
     PI[3]=1190.0
@@ -5022,71 +5151,114 @@ A["METHANL8LS"]=function methanl8ls(x::AbstractVector)
     PI[6]=1160.0
     PI[7]=1150.0
     PI[8]=1140.0
-    for j =1:M
-        #2.1
-        E11J = -1 * x[2,j] * ( v[1] + B1 )
-        E12J = v[1]*x[1,j]*1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))
-        term1 = x[1,j]*B1+E11J+E12J
-        sum = sum + 10^(-4)*term1^2
-        #2.3
-        E31J = x[N-1,j]*(1 * 1 * exp(A[j] + (B[j] / (t[N-1] + C[j]))))
-        term2 = -x[N,j]+E31J
-        sum = sum + term2^2
-        #2.2
-        for i = 2:(N-1)
-            E21IJ = -1 * x[i+1,j] * ( v[i] + 1 )
-            E22IJ = v[i-1]*x[i-1,j]*-1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))
-            E23IJ=1 * x[i,j] * ( v[i-1] + 1 )
-            E24IJ = v[i]*x[i,j]*1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))
-            term2 = E21IJ+E22IJ+E23IJ+E24IJ
-            if i==2
-                term2=term2-FL[j]
-            elseif i==3
-                term2=term2-FV[j]
-            end
-            sum = sum+ 10^(-4)*term2^2
-        end
+    E11=zeros(M)
+    E12=zeros(M)
+    E31=zeros(M)
+    E81=zeros(M)
+    E82=zeros(M)
+    E83=zeros(M)
+    E21=zeros(N-2,M)
+    E22=zeros(N-2,M)
+    E23=zeros(N-2,M)
+    E24=zeros(N-2,M)
+    E91=zeros(N-2,M)
+    E92=zeros(N-2,M)
+    E93=zeros(N-2,M)
+    E94=zeros(N-2,M)
+    E71=zeros(N,M)
+    M21=zeros(M)
+    M23=zeros(M)
+    M22=zeros(N-2,M)
+    M27=ones(N)
+    M27=-1*M27
+    M28=-Q
+    M29=zeros(N-2)
+    SHF=0
+    BHF=0
+    for j=1:M
+        M22[K,j]=-FL[j]
+        M22[K+1,j]=-FV[j]
+        temp1=AL2[j]*TF^2
+        temp2=AL1[j]*TF
+        temp1=temp1+temp2+AL[j]
+        SHF=SHF+temp1*FL[j]
+        temp1=BE2[j]*TF^2
+        temp2=BE1[j]*TF
+        temp1=temp1+temp2+BE[j]
+        BHF=BHF+temp1*FV[j]
     end
-    #2.7
-    for i = 1:(N)
-        sum1=0
-        for j =1:M
-        E71IJ = x[i,j]*(1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j]))))
-        term3 = -1+E71IJ
-        sum1=sum1+term3
-        end
-        sum=sum+sum1^2
-    end
-    #2.8
-    term4=0
+    M29[K]=-SHF
+    M29[K+1]=-BHF
     for j = 1:M
-        E81J = 1 * 1 * exp(A[j] + (B[j] / (t[1] + C[j])))*v[1] * x[1,j]*(BE[j] + BE1[j] * t[1] + BE2[j] * t[1] * t[1])
-        E82J = B1*x[1,j]*(AL[j] + AL1[j] * t[1] + AL2[j] * t[1] * t[1])
-        E83J = -1 * x[2,j] * ( 1 + v[1] )*(AL[j] + AL1[j] * t[1] + AL2[j] * t[2] * t[2])
-        term4 = term4-Q+E81J+E82J+E83J
+        E11[j]=-x[2,j]*(v[1]+B1)
+        E12[j]=v[1]*x[1,j]*1*(1/PI[1])*exp(A[j]+(B[j]/(t[1]+C[j])))
+        for i=1:(N-2)
+            E22[i,j]=v[i]*x[i,j]*-1*(1/PI[i])*exp(A[j]+(B[j]/(t[i]+C[j])))
+            E21[K,j]=-x[i+2,j]*(v[i+1]-D)
+            E23[K,j]=x[i+1,j]*(v[i]+B1)
+            E24[i,j]=v[i+1]*x[i+1,j]*1*(1/PI[i+1])*exp(A[j]+(B[j]/(t[i+1]+C[j])))
+        end
+        for i =1:(K-1)
+            E21[i,j]=-x[i+2,j]*(v[i+1]+B1)
+            E23[i,j]=x[i+1,j]*(v[i]+B1)
+        end
+        for i =(K+1):(N-2)
+            E21[i,j]=-x[i+2,j]*(v[i+1]-D)
+            E23[i,j]=x[i+1,j]*(v[i]-D)
+        end
+        E31[j]=x[N-1,j]*(1*(1/PI[N-1])*exp(A[j]+(B[j]/(t[N-1]+C[j]))))
     end
-    sum = sum+10^(-10)*term4^2
-    #2.9
-    for i = 2:(N-1)
-        sum1=0
-        SHF=0
-        BHF=0
-        for j = 1:M
-        E91IJ = 1 * 1 * exp(A[j] + (B[j] / (t[i] + C[j])))*v[i] * x[i,j]*(BE[j] + BE1[j] * t[i] + BE2[j] * t[i] * t[i])
-        E92IJ = 1 * x[i,j] * ( 1 + v[i-1] ) *(AL[j] + AL1[j] * t[i] + AL2[j] * t[i] * t[i])
-        E93IJ = -1 * 1 * exp(A[j] + (B[j] / (t[i-1] + C[j])))*v[i-1] * x[i-1,j]*(BE[j] + BE1[j] * t[i-1] + BE2[j] * t[i-1] * t[i-1])
-        E94IJ = -1 * x[i+1,j] * ( 1 + v[i] ) *(AL[j] + AL1[j] * t[i+1] + AL2[j] * t[i+1] * t[i+1])
-        term5 = E91IJ+E92IJ+E93IJ+E94IJ
-        SHF= SHF+FL[j]*(AL[j]+TF^2*AL2[j]+TF*AL1[j])
-        BHF= BHF+FV[j]*(BE[j]+TF^2*BE2[j]+TF*BE1[j])
-        sum1=sum1+term5
+    for j=1:M
+        for i=0:(N-1)
+            E71[i+1,j]=x[i+1,j]*(1*(1/PI[i+1])*exp(A[j]+(B[j]/(t[i+1]+C[j]))))
         end
-        if i==2
-            sum1=sum1-SHF
-        elseif i==3
-            sum1=sum1-BHF
+    end
+    for j=1:M
+        E81[j]=v[1]*x[1,j]*(1*(1/PI[1])*exp(A[j]+(B[j]/(t[1]+C[j]))))*(BE[j]+BE1[j]*t[1]+BE2[j]*t[1]*t[1])
+        E82[j]=B1*x[1,j]*(AL[j]+AL1[j]*t[1]+AL2[j]*t[1]*t[1])
+        E83[j]=-1*x[2,j]*(B1+v[1])*(AL[j]+AL1[j]*t[2]+AL2[j]*t[2]*t[2])
+        for i=1:(N-2)
+            E91[i,j]=v[i+1]*x[i+1,j]*(1*(1/PI[i+1])*exp(A[j]+(B[j]/(t[i+1]+C[j]))))*(BE[j]+BE1[j]*t[i+1]+BE2[j]*t[i+1]*t[i+1])
+            E92[K,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[K,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+            E93[i,j]=v[i]*x[i,j]*(-1*(1/PI[i])*exp(A[j]+(B[j]/(t[i]+C[j]))))*(BE[j]+BE1[j]*t[i]+BE2[j]*t[i]*t[i])
         end
-        sum = sum+10^(-10)*sum1^2
+        for i=1:(K-1)
+            E92[i,j]=1*x[i+1,j]*(B1+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[i,j]=-1*x[i+2,j]*(B1+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+        end
+        for i=(K+1):(N-2)
+            E92[i,j]=1*x[i+1,j]*(-D+v[i])*(AL[j]+AL1[j]*t[i+1]+AL2[j]*t[i+1]*t[i+1])
+            E94[i,j]=-1*x[i+2,j]*(-D+v[i+1])*(AL[j]+AL1[j]*t[i+2]+AL2[j]*t[i+2]*t[i+2])
+        end
+    end
+    for j=1:M
+        M21[j]=M21[j]+E11[j]+E12[j]
+        M23[j]=M23[j]+E31[j]
+        M28=M28+E81[j]+E82[j]+E83[j]
+        for i=1:(N-2)
+            M22[i,j]=M22[i,j]+E21[i,j]+E22[i,j]+E23[i,j]+E24[i,j]
+            M29[i]=M29[i]+E91[i,j]+E92[i,j]+E93[i,j]+E94[i,j]
+        end
+        for i=0:(N-1)
+            M27[i+1]=M27[i+1]+E71[i+1,j]
+        end
+    end
+    for j=1:M
+        sum=sum+10^(-4)*(M21[j]+B1*x[1,j])^2
+        sum=sum+(-x[N,j]+M23[j])^2
+    end
+    for j=1:M
+        for i=1:(N-2)
+            sum=sum+10^(-4)*M22[i,j]^2
+        end
+    end
+    for i=1:N
+        sum=sum+M27[i]^2
+    end
+    sum=sum+10^(-10)*M28^2
+    for i=1:(N-2)
+        sum=sum+10^(-10)*M29[i]^2
     end
     return sum #, grad
 end
@@ -5106,40 +5278,40 @@ for i =1:length(problemVector)
     println(soln)
 end
 
-# function unitTesting(problemVector,sumArray,gradArray,z)
-#     sumArraySIF = ones(length(problemVector))
-#     gradArraySIF = ones(length(problemVector))
-#     for i = 1:length(problemVector)
-#         problem = problemVector[i]
-#         lens=B[problem]
-#         #x=z[1:lens]
-#         x=ones(lens)
-#         temp=A[problem](x)
-#         sumArray[i]=temp
-#         println("Working on: "*problem)
-#         nlp = CUTEstModel(problem, verbose=false)
-#         fx = obj(nlp, x)
-#         #gx = grad(nlp, x)
-#         finalize(nlp)
-#         fx = convert(Float64,fx)
-#         #gx = convert(Array{Float64},gx)
-#         sumArraySIF[i] = fx
-#         #gradArraySIF[i] = gx
-#     end
-#     for i = 1:length(problemVector)
-#         if sumArray[i]-sumArraySIF[i] != 0
-#             println("Issue with sum: " * problemVector[i])
-#             println(sumArray[i])
-#             println(sumArraySIF[i])
-#             # println(x)
-#         end
-#         # if gradArray[i]-gradArraySIF[i] != 0
-#         #     println("grad: " * problemVector[i])
-#         #     # println(x)
-#         # end
-#     end
-# end
+function unitTesting(problemVector,sumArray,gradArray,z)
+    sumArraySIF = ones(length(problemVector))
+    gradArraySIF = ones(length(problemVector))
+    for i = 1:length(problemVector)
+        problem = problemVector[i]
+        lens=B[problem]
+        #x=z[1:lens]
+        x=ones(lens)
+        temp=A[problem](x)
+        sumArray[i]=temp
+        println("Working on: "*problem)
+        nlp = CUTEstModel(problem, verbose=false)
+        fx = obj(nlp, x)
+        #gx = grad(nlp, x)
+        finalize(nlp)
+        fx = convert(Float64,fx)
+        #gx = convert(Array{Float64},gx)
+        sumArraySIF[i] = fx
+        #gradArraySIF[i] = gx
+    end
+    for i = 1:length(problemVector)
+        if sumArray[i]-sumArraySIF[i] != 0
+            println("Issue with sum: " * problemVector[i])
+            println(sumArray[i])
+            println(sumArraySIF[i])
+            # println(x)
+        end
+        # if gradArray[i]-gradArraySIF[i] != 0
+        #     println("grad: " * problemVector[i])
+        #     # println(x)
+        # end
+    end
+end
 
-# unitTesting(problemVector,sumArray,gradArray,z)
+unitTesting(problemVector,sumArray,gradArray,z)
 
-# end
+end
