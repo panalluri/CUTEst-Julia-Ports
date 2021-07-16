@@ -5,15 +5,12 @@ export wrapfun
 using CUTEst
 using NLPModels
 
-problemVector = ["LOGHAIRY","QUARTC","TQUARTIC","NONDQUAR","QING","SSI","KSSLS","POWELLSG","POWELLBSLS","POWELLSQLS","WAYSEA2","WAYSEA1","PENALTY1","DQRTIC","BDQRTIC","DQDRTIC","WOODS","DANWOODLS","DANIWOODLS","ARGTRIGLS","CURLY10","CURLY20","CURLY30","SCURLY30","SCURLY20","SCURLY10","BROWNAL","BROWNBS","BROWNDEN","HELIX","MEXHAT","POWERSUM","SPARSQUR","ELATVIDU","LANCZOS3LS","TRIGON2","DENSCHNE","MISRA1CLS","PALMER4C","CRAGGLVY","PALMER3C","LANCZOS1LS","CHNROSNB","EDENSCH","RECIPELS","EGGCRATE","CHWIRUT1LS","MGH10LS","HATFLDGLS","BARD","ERRINROS","HATFLDFLS","MOREBV","ARGLINB","HATFLDFL","DEVGLA1"]
-sumArray=zeros(length(problemVector))
-gradArray=zeros(length(problemVector))
-len=zeros(length(problemVector))
+A = Dict{String,Function}()
 
-function loghairy(x::AbstractVector)
+A["LOGHAIRY"]=function loghairy(x::AbstractVector)
     println("Julia port of CUTEST's LOGHAIRY")
     #grad = zeros(size(x))
-    term1 = 30*sin(7*x[1])^2*cos(7*x[1])^2
+    term1 = 30*sin(7*x[1])^2*cos(7*x[2])^2
     term2 = (x[1]-x[2])^2 + 0.01
     term3 = 0.01+x[1]^2
     sum = 0.01*(100+ term1 + 100*sqrt(term2) + 100*sqrt(term3))
@@ -21,7 +18,7 @@ function loghairy(x::AbstractVector)
     return sum#, grad
 end
 
-function quartc(x::AbstractVector)
+A["QUARTC"]=function quartc(x::AbstractVector)
     println("Julia port of CUTEST's QUARTC")
     #grad = zeros(size(x))
     sum = 0
@@ -32,18 +29,18 @@ function quartc(x::AbstractVector)
     return sum#, grad
 end
 
-function tquartic(x::AbstractVector)
+A["TQUARTIC"]=function tquartic(x::AbstractVector)
     println("Julia port of CUTEST's TQUARTIC")
     #grad = zeros(size(x))
     sum = (x[1]-1)^2
     for i = 2:(length(x))
-      term1 = (x[i]^2-x[i]^2)^2
+      term1 = (x[1]^2-x[i]^2)^2
       sum = sum + term1
     end
     return sum#, grad
 end
 
-function nondquar(x::AbstractVector)
+A["NONDQUAR"]=function nondquar(x::AbstractVector)
     println("Julia port of CUTEST's NONDQUAR")
     #grad = zeros(size(x))
     sum = (x[1]-x[2])^2 + (x[length(x)-1]-x[length(x)])^2
@@ -55,7 +52,7 @@ function nondquar(x::AbstractVector)
     return sum#, grad
 end
 
-function qing(x::AbstractVector)
+A["QING"]=function qing(x::AbstractVector)
     println("Julia port of CUTEST's QING")
     #grad = zeros(size(x))
     sum = 0
@@ -66,7 +63,7 @@ function qing(x::AbstractVector)
     return sum#, grad
 end
 
-function ssi(x::AbstractVector)
+A["SSI"]=function ssi(x::AbstractVector)
     println("Julia port of CUTEST's SSI")
     term1 = x[1]^2*x[3]-4
     term2 = x[2]^2+x[3]
@@ -75,7 +72,7 @@ function ssi(x::AbstractVector)
     return sum#, grad
 end
 
-function kssls(x::AbstractVector)
+A["KSSLS"]=function kssls(x::AbstractVector)
     println("Julia port of CUTEST's KSSLS")
     #grad = zeros(size(x))
     sum=0
@@ -92,7 +89,7 @@ function kssls(x::AbstractVector)
     return sum#, grad
 end
 
-function powellsg(x::AbstractVector)
+A["POWELLSG"]=function powellsg(x::AbstractVector)
     println("Julia port of CUTEST's POWELLSG")
     #grad = zeros(size(x))
     sum=0
@@ -106,7 +103,7 @@ function powellsg(x::AbstractVector)
     return sum#, grad
 end
 
-function powellbsls(x::AbstractVector)
+A["POWELLBSLS"]=function powellbsls(x::AbstractVector)
     println("Julia port of CUTEST's POWELLBSLS")
     #grad = zeros(size(x))
     sum=0
@@ -118,7 +115,7 @@ function powellbsls(x::AbstractVector)
     return sum#, grad
 end
 
-function powellsqls(x::AbstractVector)
+A["POWELLSQLS"]=function powellsqls(x::AbstractVector)
     println("Julia port of CUTEST's POWELLSQLS")
     #grad = zeros(size(x))
     term1= x[1]^4
@@ -127,7 +124,7 @@ function powellsqls(x::AbstractVector)
     return sum#, grad
 end
 
-function waysea2(x::AbstractVector)
+A["WAYSEA2"]=function waysea2(x::AbstractVector)
     println("Julia port of CUTEST's WAYSEA2")
     #grad = zeros(size(x))
     sum=(x[2]-1)^2
@@ -140,7 +137,7 @@ function waysea2(x::AbstractVector)
     return sum#, grad
 end
 
-function waysea1(x::AbstractVector)
+A["WAYSEA1"]=function waysea1(x::AbstractVector)
     println("Julia port of CUTEST's WAYSEA1")
     grad = zeros(size(x))
     term1 = x[2]^4+x[1]^6-17
@@ -149,7 +146,7 @@ function waysea1(x::AbstractVector)
     return sum#, grad
 end
 
-function penalty1(x::AbstractVector)
+A["PENALTY1"]=function penalty1(x::AbstractVector)
     println("Julia port of CUTEST's PENALTY1")
     grad = zeros(size(x))
     sum = 0
@@ -165,18 +162,18 @@ function penalty1(x::AbstractVector)
     return sum#, grad
 end
 
-function dqrtic(x::AbstractVector)
+A["DQRTIC"]=function dqrtic(x::AbstractVector)
     println("Julia port of CUTEST's DQRTIC")
     grad = zeros(size(x))
     sum = 0
     for i = 1:(length(x))
-      term1 = i*x[i]-i
+      term1 = x[i]-i
       sum=sum+term1^4
     end
     return sum#, grad
 end
 
-function bdqrtic(x::AbstractVector)
+A["BDQRTIC"]=function bdqrtic(x::AbstractVector)
     println("Julia port of CUTEST's BDQRTIC")
     grad = zeros(size(x))
     sum=0
@@ -188,7 +185,7 @@ function bdqrtic(x::AbstractVector)
     return sum#, grad
 end
 
-function dqdrtic(x::AbstractVector)
+A["DQDRTIC"]=function dqdrtic(x::AbstractVector)
     println("Julia port of CUTEST's DQDRTIC")
     grad = zeros(size(x))
     sum=0
@@ -198,8 +195,7 @@ function dqdrtic(x::AbstractVector)
     return sum#, grad
 end
 
-#ENTIRELY DYSFUNCTIONAL
-function woods(x::AbstractVector)
+A["WOODS"]=function woods(x::AbstractVector)
     println("Julia port of CUTEST's WOODS")
     #grad = zeros(size(x))
     sum = 0
@@ -213,11 +209,11 @@ function woods(x::AbstractVector)
       term6 = x[4*i-2]-x[4*i]
       sum = sum+ 100*term1^2+term2^2+90*term3^2+term4^2+10*term5^2+0.1*term6^2
     end
-    sum=sum+1
+    sum=sum#+1
     return sum#, grad
 end
 
-function danwoodls(x::AbstractVector)
+A["DANWOODLS"]=function danwoodls(x::AbstractVector)
     println("Julia port of CUTEST's DANWOODLS")
     grad = zeros(size(x))
     sum = 0
@@ -243,7 +239,7 @@ function danwoodls(x::AbstractVector)
     return sum#, grad
 end
 
-function daniwoodls(x::AbstractVector)
+A["DANIWOODLS"]=function daniwoodls(x::AbstractVector)
     println("Julia port of CUTEST's DANIWOODLS")
     grad = zeros(size(x))
     sum = 0
@@ -269,7 +265,7 @@ function daniwoodls(x::AbstractVector)
     return sum#, grad
 end
 
-function argtrigls(x::AbstractVector)
+A["ARGTRIGLS"]=function argtrigls(x::AbstractVector)
     println("Julia port of CUTEST's ARGTRIGLS")
     grad = zeros(size(x))
     sum = 0
@@ -287,7 +283,7 @@ function argtrigls(x::AbstractVector)
     return sum#, grad
 end
 
-function curly10(x::AbstractVector)
+A["CURLY10"]=function curly10(x::AbstractVector)
     println("Julia port of CUTEST's CURLY10")
     grad = zeros(size(x))
     sum = 0
@@ -308,7 +304,7 @@ function curly10(x::AbstractVector)
     return sum#, grad
 end
 
-function curly20(x::AbstractVector)
+A["CURLY20"]=function curly20(x::AbstractVector)
     println("Julia port of CUTEST's CURLY20")
     grad = zeros(size(x))
     sum = 0
@@ -329,7 +325,7 @@ function curly20(x::AbstractVector)
     return sum#, grad
 end
 
-function curly30(x::AbstractVector)
+A["CURLY30"]=function curly30(x::AbstractVector)
     println("Julia port of CUTEST's CURLY30")
     grad = zeros(size(x))
     sum = 0
@@ -350,7 +346,7 @@ function curly30(x::AbstractVector)
     return sum#, grad
 end
 
-function scurly30(x::AbstractVector)
+A["SCURLY30"]=function scurly30(x::AbstractVector)
     println("Julia port of CUTEST's SCURLY30")
     grad = zeros(size(x))
     sum = 0
@@ -373,7 +369,7 @@ function scurly30(x::AbstractVector)
     return sum#, grad
 end
 
-function scurly20(x::AbstractVector)
+A["SCURLY20"]=function scurly20(x::AbstractVector)
     println("Julia port of CUTEST's SCURLY20")
     grad = zeros(size(x))
     sum = 0
@@ -396,7 +392,7 @@ function scurly20(x::AbstractVector)
     return sum#, grad
 end
 
-function scurly10(x::AbstractVector)
+A["SCURLY10"]=function scurly10(x::AbstractVector)
     println("Julia port of CUTEST's SCURLY10")
     grad = zeros(size(x))
     sum = 0
@@ -419,13 +415,13 @@ function scurly10(x::AbstractVector)
     return sum#, grad
 end
 
-function brownal(x::AbstractVector)
+A["BROWNAL"]=function brownal(x::AbstractVector)
     println("Julia port of CUTEST's BROWNAL")
     grad = zeros(size(x))
     sum = 0
     for i = 1:(length(x)-1)
       sum1=0
-      term1 = 2*x[i]-(length(x)-1)
+      term1 = 2*x[i]-(length(x)+1)
       sum1=sum1+term1
       for j = 1:(i-1)
         sum1=sum1+x[j]
@@ -439,7 +435,7 @@ function brownal(x::AbstractVector)
     return sum#, grad
 end
 
-function brownbs(x::AbstractVector)
+A["BROWNBS"]=function brownbs(x::AbstractVector)
     println("Julia port of CUTEST's BROWNBS")
     grad = zeros(size(x))
     sum=0
@@ -452,7 +448,7 @@ function brownbs(x::AbstractVector)
     return sum#, grad
 end
 
-function brownden(x::AbstractVector)
+A["BROWNDEN"]=function brownden(x::AbstractVector)
     println("Julia port of CUTEST's BROWNDEN")
     grad = zeros(size(x))
     sum = 0
@@ -464,17 +460,17 @@ function brownden(x::AbstractVector)
     return sum#, grad
 end
 
-function helix(x::AbstractVector)
+A["HELIX"]=function helix(x::AbstractVector)
     println("Julia port of CUTEST's HELIX")
     grad = zeros(size(x))
     sum = 0
-    term1 = x[3] + 1.5915494/(x[1]^2+x[2]^2)*x[2]-1.5915494*atan(x[2],x[1])
+    term1 = x[3]-1.5915494*atan(x[2],x[1])
     term2 = sqrt(x[1]^2+x[2]^2)-1
     sum = sum + 100*term1^2 + 100*term2^2 + x[3]^2
     return sum#, grad
 end
 
-function mexhat(x::AbstractVector)
+A["MEXHAT"]=function mexhat(x::AbstractVector)
     println("Julia port of CUTEST's MEXHAT")
     grad = zeros(size(x))
     term1 = -0.02+10^4*(x[2]-x[1]^2)^2 + (x[1]-1)^2
@@ -483,7 +479,7 @@ function mexhat(x::AbstractVector)
     return sum#, grad
 end
 
-function powersum(x::AbstractVector)
+A["POWERSUM"]=function powersum(x::AbstractVector)
     println("Julia port of CUTEST's POWERSUM")
     grad = zeros(size(x))
     sum = 0
@@ -506,19 +502,20 @@ function powersum(x::AbstractVector)
     return sum#, grad
 end
 
-function sparsqur(x::AbstractVector)
+A["SPARSQUR"]=function sparsqur(x::AbstractVector)
     println("Julia port of CUTEST's SPARSQUR")
     grad = zeros(size(x))
     sum = 0
+    N=length(x)
     for i = 1:length(x)
       coeff = 0.5*i
-      term = 0.5*x[i]^2+5*0.5*x[1]^2
+      term = 0.5*x[i]^2+0.5*x[mod(2*i-1,N)+1]^2+0.5*x[mod(3*i-1,N)+1]^2+0.5*x[mod(5*i-1,N)+1]^2+0.5*x[mod(7*i-1,N)+1]^2+0.5*x[mod(11*i-1,N)+1]^2
       sum = sum + coeff*term^2
     end
     return sum#, grad
 end
 
-function elatvidu(x::AbstractVector)
+A["ELATVIDU"]=function elatvidu(x::AbstractVector)
     println("Julia port of CUTEST's ELATVIDU")
     grad = zeros(size(x))
     sum = 0
@@ -529,7 +526,7 @@ function elatvidu(x::AbstractVector)
     return sum#, grad
 end
 
-function lanczos3ls(x::AbstractVector)
+A["LANCZOS3LS"]=function lanczos3ls(x::AbstractVector)
     println("Julia port of CUTEST's LANCZOS3LS")
     grad = zeros(size(x))
     sum = 0
@@ -593,7 +590,7 @@ function lanczos3ls(x::AbstractVector)
     return sum#, grad
 end
 
-function trigon2(x::AbstractVector)
+A["TRIGON2"]=function trigon2(x::AbstractVector)
     println("Julia port of CUTEST's TRIGON2")
     grad = zeros(size(x))
     sum = 1
@@ -606,14 +603,14 @@ function trigon2(x::AbstractVector)
     return sum#, grad
 end
 
-function denschne(x::AbstractVector)
+A["DENSCHNE"]=function denschne(x::AbstractVector)
     println("Julia port of CUTEST's DENSCHNE")
     grad = zeros(size(x))
     sum = x[1]^2+(x[2]+x[2]^2)^2+(exp(x[3])-1)^2
     return sum#, grad
 end
 
-function misra1cls(x::AbstractVector)
+A["MISRA1CLS"]=function misra1cls(x::AbstractVector)
     println("Julia port of CUTEST's MISRA1CLS")
     grad = zeros(size(x))
     X=zeros(14)
@@ -655,7 +652,7 @@ function misra1cls(x::AbstractVector)
     return sum#, grad
 end
 
-function palmer4c(x::AbstractVector)
+A["PALMER4C"]=function palmer4c(x::AbstractVector)
     println("Julia port of CUTEST's PALMER4C")
     grad = zeros(size(x))
     X=zeros(23)
@@ -715,14 +712,14 @@ function palmer4c(x::AbstractVector)
     return sum#, grad
 end
 
-function cragglvy(x::AbstractVector)
+A["CRAGGLVY"]=function cragglvy(x::AbstractVector)
     println("Julia port of CUTEST's CRAGGLVY")
     grad = zeros(size(x))
     sum = 0
     M = convert(Int64,0.5*(length(x)-2))
     for i = 1:M
       term1 = exp(x[2*i-1])-x[2*i]
-      term2 = x[2*i]-x[2*i-1]
+      term2 = x[2*i]-x[2*i+1]
       term3 = x[2*i+1]-x[2*i+2]+tan(x[2*i+1]-x[2*i+2])
       term4= x[2*i-1]
       term5 = x[2*i+2]-1
@@ -731,7 +728,7 @@ function cragglvy(x::AbstractVector)
     return sum#, grad
 end
 
-function palmer3c(x::AbstractVector)
+A["PALMER3C"]=function palmer3c(x::AbstractVector)
     println("Julia port of CUTEST's PALMER3C")
     grad = zeros(size(x))
     X=zeros(23)
@@ -793,7 +790,7 @@ function palmer3c(x::AbstractVector)
     return sum#, grad
 end
 
-function lanczos1ls(x::AbstractVector)
+A["LANCZOS1LS"]=function lanczos1ls(x::AbstractVector)
     println("Julia port of CUTEST's LANCZOS1LS")
     grad = zeros(size(x))
     sum = 0
@@ -830,7 +827,7 @@ function lanczos1ls(x::AbstractVector)
     return sum#, grad
 end
 
-function chnrosnb(x::AbstractVector)
+A["CHNROSNB"]=function chnrosnb(x::AbstractVector)
     println("Julia port of CUTEST's CHNROSNB")
     grad = zeros(size(x))
     sum = 0
@@ -893,7 +890,7 @@ function chnrosnb(x::AbstractVector)
     return sum#, grad
 end
 
-function edensch(x::AbstractVector)
+A["EDENSCH"]=function edensch(x::AbstractVector)
     println("Julia port of CUTEST's EDENSCH")
     grad = zeros(size(x))
     sum=16
@@ -906,7 +903,7 @@ function edensch(x::AbstractVector)
     return sum#, grad
 end
 
-function recipels(x::AbstractVector)
+A["RECIPELS"]=function recipels(x::AbstractVector)
     println("Julia port of CUTEST's RECIPELS")
     grad = zeros(size(x))
     term1 = (x[1]-5)
@@ -916,7 +913,7 @@ function recipels(x::AbstractVector)
     return sum#, grad
 end
 
-function eggcrate(x::AbstractVector)
+A["EGGCRATE"]=function eggcrate(x::AbstractVector)
     println("Julia port of CUTEST's EGGCRATE")
     grad = zeros(size(x))
     term1 = 5*sin(x[1])
@@ -925,7 +922,7 @@ function eggcrate(x::AbstractVector)
     return sum#, grad
 end
 
-function chwirut1ls(x::AbstractVector)
+A["CHWIRUT1LS"]=function chwirut1ls(x::AbstractVector)
     println("Julia port of CUTEST's CHWIRUT1LS")
     X=zeros(214)
     Y=zeros(214)
@@ -1369,7 +1366,7 @@ function chwirut1ls(x::AbstractVector)
     return sum#, grad
 end
 
-function mgh10ls(x::AbstractVector)
+A["MGH10LS"]=function mgh10ls(x::AbstractVector)
     println("Julia port of CUTEST's MGH10LS")
     X=zeros(16)
     Y=zeros(16)
@@ -1417,7 +1414,7 @@ function mgh10ls(x::AbstractVector)
     return sum#, grad
 end
 
-function hatfldgls(x::AbstractVector)
+A["HATFLDGLS"]=function hatfldgls(x::AbstractVector)
     println("Julia port of CUTEST's HATFLDGLS")
     grad = zeros(size(x))
     term1 = -x[1]*x[2]+x[1]-x[13]+1
@@ -1430,7 +1427,7 @@ function hatfldgls(x::AbstractVector)
     return sum#, grad
 end
 
-function bard(x::AbstractVector)
+A["BARD"]=function bard(x::AbstractVector)
     println("Julia port of CUTEST's BARD")
     grad = zeros(size(x))
     sum=0
@@ -1461,7 +1458,7 @@ function bard(x::AbstractVector)
     return sum#, grad
 end
 
-function errinros(x::AbstractVector)
+A["ERRINROS"]=function errinros(x::AbstractVector)
     println("Julia port of CUTEST's ERRINROS")
     grad = zeros(size(x))
     sum=0
@@ -1524,7 +1521,7 @@ function errinros(x::AbstractVector)
     return sum#, grad
 end
 
-function hatfldfls(x::AbstractVector)
+A["HATFLDFLS"]=function hatfldfls(x::AbstractVector)
     println("Julia port of CUTEST's HATFLDFLS")
     grad = zeros(size(x))
     term1 = x[1]-0.032+x[2]*exp(1*x[3])
@@ -1534,7 +1531,7 @@ function hatfldfls(x::AbstractVector)
     return sum#, grad
 end
 
-function morebv(x::AbstractVector)
+A["MOREBV"]=function morebv(x::AbstractVector)
     println("Julia port of CUTEST's MOREBV")
     grad = zeros(size(x))
     sum=0
@@ -1551,7 +1548,8 @@ function morebv(x::AbstractVector)
     return sum#, grad
 end
 
-function arglinb(x::AbstractVector)
+#follows SIF file, doesn't match CUTEst twin
+A["ARGLINB"]=function arglinb(x::AbstractVector)
     println("Julia port of CUTEST's ARGLINB")
     grad = zeros(size(x))
     sum=0
@@ -1567,7 +1565,7 @@ function arglinb(x::AbstractVector)
     return sum#, grad
 end
 
-function hatfldfl(x::AbstractVector)
+A["HATFLDFL"]=function hatfldfl(x::AbstractVector)
     println("Julia port of CUTEST's HATFLDFL")
     grad = zeros(size(x))
     sum=0
@@ -1578,7 +1576,7 @@ function hatfldfl(x::AbstractVector)
     return sum#, grad
 end
 
-function devgla1(x::AbstractVector)
+A["DEVGLA1"]=function devgla1(x::AbstractVector)
     println("Julia port of CUTEST's DEVGLA1")
     grad = zeros(size(x))
     sum=0
@@ -1587,191 +1585,40 @@ function devgla1(x::AbstractVector)
         term2 = sin(0.1*(i-1)*x[3]+x[4])
         term3 = 60.137*exp(0.1*(i-1)*log(1.371))
         term4 = sin(3.112*0.1*(i-1)+1.761)
-        sum=sum+(term1*term2-term3*term4-Y[i])^2
+        sum=sum+(term1*term2-term3*term4)^2
     end
     return sum#, grad
 end
 
-len[1]=2
-x=ones(2)
-sumArray[1] = loghairy(x)
-len[2]=5000
-x=ones(5000)
-sumArray[2] = quartc(x)
-len[3]=5000
-x=ones(5000)
-sumArray[3] = tquartic(x)
-len[4]=5000
-x=ones(5000)
-sumArray[4] = nondquar(x)
-len[5]=100
-x=ones(100)
-sumArray[5] = qing(x)
-len[6]=3
-x=ones(3)
-sumArray[6] = ssi(x)
-len[7]=1000
-x=ones(1000)
-sumArray[7] = kssls(x)
-len[8]=5000
-x=ones(5000)
-sumArray[8] = powellsg(x)
-len[9]=2
-x=ones(2)
-sumArray[9] = powellbsls(x)
-len[10]=2
-x=ones(2)
-sumArray[10] = powellsqls(x)
-len[11]=2
-x=ones(2)
-sumArray[11] = waysea2(x)
-len[12]=2
-x=ones(2)
-sumArray[12] = waysea1(x)
-len[13]=1000
-x=ones(1000)
-sumArray[13] = penalty1(x)
-len[14]=5000
-x=ones(5000)
-sumArray[14] = dqrtic(x)
-len[15]=5000
-x=ones(5000)
-sumArray[15] = bdqrtic(x)
-len[16]=5000
-x=ones(5000)
-sumArray[16] = dqdrtic(x)
-len[17]=4000
-x=ones(4000)
-sumArray[17] = woods(x)
-len[18]=2
-x=ones(2)
-sumArray[18] = danwoodls(x)
-len[19]=2
-x=ones(2)
-sumArray[19] = daniwoodls(x)
-len[20]=200
-x=ones(200)
-sumArray[20] = argtrigls(x)
-len[21]=10000
-x=ones(10000)
-sumArray[21] = curly10(x)
-len[22]=10000
-x=ones(10000)
-sumArray[22] = curly20(x)
-len[23]=10000
-x=ones(10000)
-sumArray[23] = curly30(x)
-len[24]=10000
-x=ones(10000)
-sumArray[24] = scurly30(x)
-len[25]=10000
-x=ones(10000)
-sumArray[25] = scurly20(x)
-len[26]=10000
-x=ones(10000)
-sumArray[26] = scurly10(x)
-len[27]=200
-x=ones(200)
-sumArray[27] = brownal(x)
-len[28]=2
-x=ones(2)
-sumArray[28] = brownbs(x)
-len[29]=4
-x=ones(4)
-sumArray[29] = brownden(x)
-len[30]=3
-x=ones(3)
-sumArray[30] = helix(x)
-len[31]=2
-x=ones(2)
-sumArray[31] = mexhat(x)
-len[32]=4
-x=ones(4)
-sumArray[32] = powersum(x)
-len[33]=10000
-x=ones(10000)
-sumArray[33] = sparsqur(x)
-len[34]=2
-x=ones(2)
-sumArray[34] = elatvidu(x)
-len[35]=6
-x=ones(6)
-sumArray[35] = lanczos3ls(x)
-len[36]=10
-x=ones(10)
-sumArray[36] = trigon2(x)
-len[37]=3
-x=ones(3)
-sumArray[37] = denschne(x)
-len[38]=2
-x=ones(2)
-sumArray[38] = misra1cls(x)
-len[39]=8
-x=ones(8)
-sumArray[39] = palmer4c(x)
-len[40]=5000
-x=ones(5000)
-sumArray[40] = cragglvy(x)
-len[41]=8
-x=ones(8)
-sumArray[41] = palmer3c(x)
-len[42]=6
-x=ones(6)
-sumArray[42] = lanczos1ls(x)
-len[43]=50
-x=ones(50)
-sumArray[43] = chnrosnb(x)
-len[44]=2000
-x=ones(2000)
-sumArray[44] = edensch(x)
-len[45]=3
-x=ones(3)
-sumArray[45] = recipels(x)
-len[46]=2
-x=ones(2)
-sumArray[46] = eggcrate(x)
-len[47]=3
-x=ones(3)
-sumArray[47] = chwirut1ls(x)
-len[48]=3
-x=ones(3)
-sumArray[48] = mgh10ls(x)
-len[49]=25
-x=ones(25)
-sumArray[49] = hatfldgls(x)
-len[50]=3
-x=ones(3)
-sumArray[50] = bard(x)
-len[51]=50
-x=ones(50)
-sumArray[51] = errinros(x)
-len[52]=3
-x=ones(3)
-sumArray[52] = hatfldfls(x)
-len[53]=5000
-x=ones(5000)
-sumArray[53] = morebv(x)
-len[54]=200
-x=ones(200)
-sumArray[54] = arglinb(x)
-len[55]=3
-x=ones(3)
-sumArray[55] = hatfldfl(x)
-len[56]=4
-x=ones(4)
-sumArray[56] = devgla1(x)
+problemVector = collect(keys(A))
+sumArray = ones(length(problemVector))
+gradArray=zeros(length(problemVector))
+B = Dict("LOGHAIRY"=>2,"QUARTC"=>5000,"TQUARTIC"=>5000,"NONDQUAR"=>5000,"QING"=>100,"SSI"=>3,"KSSLS"=>1000,"POWELLSG"=>5000,"POWELLBSLS"=>2,"POWELLSQLS"=>2,"WAYSEA2"=>2,"WAYSEA1"=>2,"PENALTY1"=>1000,"DQRTIC"=>5000,"BDQRTIC"=>5000,"DQDRTIC"=>5000,"WOODS"=>4000,"DANWOODLS"=>2,"DANIWOODLS"=>2,"ARGTRIGLS"=>200,"CURLY10"=>10000,"CURLY20"=>10000,"CURLY30"=>10000,"SCURLY30"=>10000,"SCURLY20"=>10000,"SCURLY10"=>10000,"BROWNAL"=>200,"BROWNBS"=>2,"BROWNDEN"=>4,"HELIX"=>3,"MEXHAT"=>2,"POWERSUM"=>4,"SPARSQUR"=>10000,"ELATVIDU"=>2,"LANCZOS3LS"=>6,"TRIGON2"=>10,"DENSCHNE"=>3,"MISRA1CLS"=>2,"PALMER4C"=>8,"CRAGGLVY"=>5000,"PALMER3C"=>8,"LANCZOS1LS"=>6,"CHNROSNB"=>50,"EDENSCH"=>2000,"RECIPELS"=>3,"EGGCRATE"=>2,"CHWIRUT1LS"=>3,"MGH10LS"=>3,"HATFLDGLS"=>25,"BARD"=>3,"ERRINROS"=>50,"HATFLDFLS"=>3,"MOREBV"=>5000,"ARGLINB"=>200,"HATFLDFL"=>3,"DEVGLA1"=>4)
+z=rand(1:10,10^6)
+println(problemVector)
 
-function unitTesting(problemVector,sumArray,gradArray,len)
+for i =1:length(problemVector)
+    prob=problemVector[i]
+    y=B[prob]
+    println(string(y)*prob)
+    soln=(A[prob](ones(y)))
+    println(soln)
+end
+
+function unitTesting(problemVector,sumArray,gradArray,z)
     sumArraySIF = ones(length(problemVector))
     gradArraySIF = ones(length(problemVector))
     for i = 1:length(problemVector)
-        temp=convert(Int64,len[i])
-        x=ones(temp)
         problem = problemVector[i]
+        lens=B[problem]
+        x=z[1:lens]
+        #x=ones(lens)
+        temp=A[problem](x)
+        sumArray[i]=temp
         println("Working on: "*problem)
         nlp = CUTEstModel(problem, verbose=false)
         fx = obj(nlp, x)
-        gx = grad(nlp, x)
+        #gx = grad(nlp, x)
         finalize(nlp)
         fx = convert(Float64,fx)
         #gx = convert(Array{Float64},gx)
@@ -1792,6 +1639,6 @@ function unitTesting(problemVector,sumArray,gradArray,len)
     end
 end
 
-unitTesting(problemVector,sumArray,gradArray,len)
+unitTesting(problemVector,sumArray,gradArray,z)
 
 end
