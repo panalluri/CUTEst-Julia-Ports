@@ -5,12 +5,9 @@ export wrapfun
 using CUTEst
 using NLPModels
 
-problemVector = ["OSCIGRAD","BOX3","OSCIPATH","BOX","BOXBODLS","BOXPOWER","ENGVAL2","ENGVAL1","ROSENBR","SROSENBR","ROSENBRTU","GENROSE","POWER","FLETCHCR","EXTROSNB","ROSZMAN1LS","DIXMAANI","LIARWHD","SCHMVETT","LUKSAN13LS","JUDGE","NONDIA","DIXMAANJ","DIXMAANC","DIXMAANL","DIXMAANK","DIXMAANG","DIXMAANF","DIXMAANE","DIXMAANP","DIXMAANH","DIXMAANB","DIXMAANN","DIXMAANA","DIXMAANO","DIXMAANM","DIXMAAND","SINVALNE","COSINE","SSCOSINE","SINEVAL","MUONSINELS","SCOSINE","SINQUAD","CLIFF","EG2","EXP2","CUBE","GAUSSIAN","HUMPS"]
-sumArray=zeros(length(problemVector))
-gradArray=zeros(length(problemVector))
-len=zeros(length(problemVector))
+A = Dict{String,Function}()
 
-function oscigrad(x::AbstractVector)
+A["OSCIGRAD"]=function oscigrad(x::AbstractVector)
     println("Julia port of CUTEST's OSCIGRAD")
     #grad = zeros(size(x))
     sum = 0.5*x[1]-0.5-4*500*(x[2]-2*x[1]^2+1)*x[1]
@@ -25,18 +22,18 @@ function oscigrad(x::AbstractVector)
     return sum#, grad
 end
 
-function box3(x::AbstractVector)
+A["BOX3"]=function box3(x::AbstractVector)
     println("Julia port of CUTEST's BOX3")
     #grad = zeros(size(x))
     sum = 0
     for i = 1:10
-      term = (exp(-0.1*i)-exp(-i))*x[3]+exp(-0.1*i*x[1])-exp(-0.1*i*x[2])
+      term = (-exp(-0.1*i)+exp(-i))*x[3]+exp(-0.1*i*x[1])-exp(-0.1*i*x[2])
       sum = sum + (term)^2
     end
     return sum#, grad
 end
 
-function oscipath(x::AbstractVector)
+A["OSCIPATH"]=function oscipath(x::AbstractVector)
     println("Julia port of CUTEST's OSCIPATH")
     #grad = zeros(size(x))
     sum = 0.25*(x[1]-1)^2
@@ -47,7 +44,7 @@ function oscipath(x::AbstractVector)
     return sum#, grad
 end
 
-function box(x::AbstractVector)
+A["BOX"]=function box(x::AbstractVector)
     println("Julia port of CUTEST's BOX")
     #grad = zeros(size(x))
     sum = 0
@@ -63,7 +60,7 @@ function box(x::AbstractVector)
     return sum#, grad
 end
 
-function boxbodls(x::AbstractVector)
+A["BOXBODLS"]=function boxbodls(x::AbstractVector)
     println("Julia port of CUTEST's BOXBODLS")
     X=zeros(6)
     Y=zeros(6)
@@ -88,7 +85,7 @@ function boxbodls(x::AbstractVector)
     return sum#, grad
 end
 
-function boxpower(x::AbstractVector)
+A["BOXPOWER"]=function boxpower(x::AbstractVector)
     println("Julia port of CUTEST's BOXPOWER")
     P=9
     #grad = zeros(size(x))
@@ -100,7 +97,7 @@ function boxpower(x::AbstractVector)
     return sum#, grad
 end
 
-function engval2(x::AbstractVector)
+A["ENGVAL2"]=function engval2(x::AbstractVector)
     println("Julia port of CUTEST's ENGVAL2")
     #grad = zeros(size(x))
     term1 = x[1]^2+x[2]^2+x[3]^2-1
@@ -112,7 +109,7 @@ function engval2(x::AbstractVector)
     return sum#, grad
 end
 
-function engval1(x::AbstractVector)
+A["ENGVAL1"]=function engval1(x::AbstractVector)
     println("Julia port of CUTEST's ENGVAL1")
     #grad = zeros(size(x))
     sum=0
@@ -124,7 +121,7 @@ function engval1(x::AbstractVector)
     return sum#, grad
 end
 
-function rosenbr(x::AbstractVector)
+A["ROSENBR"]=function rosenbr(x::AbstractVector)
     println("Julia port of CUTEST's ROSENBR")
     #grad = zeros(size(x))
     term1= 100*(x[2]-x[1]^2)^2
@@ -133,7 +130,7 @@ function rosenbr(x::AbstractVector)
     return sum#, grad
 end
 
-function srosenbr(x::AbstractVector)
+A["SROSENBR"]=function srosenbr(x::AbstractVector)
     println("Julia port of CUTEST's SROSENBR")
     #grad = zeros(size(x))
     sum=0
@@ -146,7 +143,7 @@ function srosenbr(x::AbstractVector)
     return sum#, grad
 end
 
-function rosenbrtu(x::AbstractVector)
+A["ROSENBRTU"]=function rosenbrtu(x::AbstractVector)
     println("Julia port of CUTEST's ROSENBRTU")
     #grad = zeros(size(x))
     term1=x[2]-x[1]^2
@@ -155,7 +152,7 @@ function rosenbrtu(x::AbstractVector)
     return sum#, grad
 end
 
-function genrose(x::AbstractVector)
+A["GENROSE"]=function genrose(x::AbstractVector)
     println("Julia port of CUTEST's GENROSE")
     grad = zeros(size(x))
     term = (1 - x[1])
@@ -173,7 +170,7 @@ function genrose(x::AbstractVector)
     return sum#, grad
 end
 
-function power(x::AbstractVector)
+A["POWER"]=function power(x::AbstractVector)
     println("Julia port of CUTEST's POWER")
     grad = zeros(size(x))
     sum = 0
@@ -188,7 +185,7 @@ function power(x::AbstractVector)
     return sum#, grad
 end
 
-function fletchcr(x::AbstractVector)
+A["FLETCHCR"]=function fletchcr(x::AbstractVector)
     println("Julia port of CUTEST's FLETCHCR")
     grad = zeros(size(x))
     sum = 0
@@ -202,7 +199,7 @@ function fletchcr(x::AbstractVector)
     return sum#, grad
 end
 
-function extrosnb(x::AbstractVector)
+A["EXTROSNB"]=function extrosnb(x::AbstractVector)
     println("Julia port of CUTEST's EXTROSNB")
     grad = zeros(size(x))
     term = (1 - x[1])
@@ -217,7 +214,7 @@ function extrosnb(x::AbstractVector)
     return sum#, grad
 end
 
-function roszman1ls(x::AbstractVector)
+A["ROSZMAN1LS"]=function roszman1ls(x::AbstractVector)
     println("Julia port of CUTEST's ROSZMAN1LS")
     #grad = zeros(size(x))
     sum = 0
@@ -283,7 +280,7 @@ function roszman1ls(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaani(x::AbstractVector)
+A["DIXMAANI"]=function dixmaani(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANI")
     grad = zeros(size(x))
     sum = 0
@@ -305,7 +302,7 @@ function dixmaani(x::AbstractVector)
     return sum#, grad
 end
 
-function liarwhd(x::AbstractVector)
+A["LIARWHD"]=function liarwhd(x::AbstractVector)
     println("Julia port of CUTEST's LIARWHD")
     grad = zeros(size(x))
     sum = 0
@@ -317,8 +314,7 @@ function liarwhd(x::AbstractVector)
     return sum#, grad
 end
 
-#THIS ONE IS WRONG!!
-function schmvett(x::AbstractVector)
+A["SCHMVETT"]=function schmvett(x::AbstractVector)
     println("Julia port of CUTEST's SCHMVETT")
     grad = zeros(size(x))
     sum = 0
@@ -334,7 +330,7 @@ function schmvett(x::AbstractVector)
     return sum#, grad
 end
 
-function luksan13ls(x::AbstractVector)
+A["LUKSAN13LS"]=function luksan13ls(x::AbstractVector)
     println("Julia port of CUTEST's LUKSAN13LS")
     grad = zeros(size(x))
     sum = 0
@@ -354,7 +350,7 @@ function luksan13ls(x::AbstractVector)
     return sum#, grad
 end
 
-function judge(x::AbstractVector)
+A["JUDGE"]=function judge(x::AbstractVector)
     println("Julia port of CUTEST's JUDGE")
     grad = zeros(size(x))
     A=zeros(20)
@@ -430,7 +426,7 @@ function judge(x::AbstractVector)
     return sum#, grad
 end
 
-function nondia(x::AbstractVector)
+A["NONDIA"]=function nondia(x::AbstractVector)
     println("Julia port of CUTEST's NONDIA")
     grad = zeros(size(x))
     term = (x[1]-1)
@@ -443,7 +439,7 @@ function nondia(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanj(x::AbstractVector)
+A["DIXMAANJ"]=function dixmaanj(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANJ")
     grad = zeros(size(x))
     sum = 0
@@ -469,7 +465,7 @@ function dixmaanj(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanc(x::AbstractVector)
+A["DIXMAANC"]=function dixmaanc(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANC")
     grad = zeros(size(x))
     sum = 0
@@ -495,7 +491,7 @@ function dixmaanc(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanl(x::AbstractVector)
+A["DIXMAANL"]=function dixmaanl(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANL")
     grad = zeros(size(x))
     sum = 0
@@ -521,7 +517,7 @@ function dixmaanl(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaank(x::AbstractVector)
+A["DIXMAANK"]=function dixmaank(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANK")
     grad = zeros(size(x))
     sum = 0
@@ -547,7 +543,7 @@ function dixmaank(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaang(x::AbstractVector)
+A["DIXMAANG"]=function dixmaang(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANG")
     grad = zeros(size(x))
     sum = 0
@@ -573,7 +569,7 @@ function dixmaang(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanf(x::AbstractVector)
+A["DIXMAANF"]=function dixmaanf(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANF")
     grad = zeros(size(x))
     sum = 0
@@ -599,7 +595,7 @@ function dixmaanf(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaane(x::AbstractVector)
+A["DIXMAANE"]=function dixmaane(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANE")
     grad = zeros(size(x))
     sum = 0
@@ -621,7 +617,7 @@ function dixmaane(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanp(x::AbstractVector)
+A["DIXMAANP"]=function dixmaanp(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANP")
     grad = zeros(size(x))
     sum = 0
@@ -649,7 +645,7 @@ function dixmaanp(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanh(x::AbstractVector)
+A["DIXMAANH"]=function dixmaanh(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANH")
     grad = zeros(size(x))
     sum = 0
@@ -675,7 +671,7 @@ function dixmaanh(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanb(x::AbstractVector)
+A["DIXMAANB"]=function dixmaanb(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANB")
     grad = zeros(size(x))
     sum = 0
@@ -701,7 +697,7 @@ function dixmaanb(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaann(x::AbstractVector)
+A["DIXMAANN"]=function dixmaann(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANN")
     grad = zeros(size(x))
     sum = 0
@@ -729,7 +725,7 @@ function dixmaann(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaana(x::AbstractVector)
+A["DIXMAANA"]=function dixmaana(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANA")
     grad = zeros(size(x))
     sum = 0
@@ -751,7 +747,7 @@ function dixmaana(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaano(x::AbstractVector)
+A["DIXMAANO"]=function dixmaano(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANO")
     grad = zeros(size(x))
     sum = 0
@@ -779,7 +775,7 @@ function dixmaano(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaanm(x::AbstractVector)
+A["DIXMAANM"]=function dixmaanm(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAANM")
     grad = zeros(size(x))
     sum = 0
@@ -802,7 +798,7 @@ function dixmaanm(x::AbstractVector)
     return sum#, grad
 end
 
-function dixmaand(x::AbstractVector)
+A["DIXMAAND"]=function dixmaand(x::AbstractVector)
     println("Julia port of CUTEST's DIXMAAND")
     grad = zeros(size(x))
     sum = 0
@@ -828,8 +824,8 @@ function dixmaand(x::AbstractVector)
     return sum#, grad
 end
 
-#SO WRONG
-function sinvalne(x::AbstractVector)
+#consistently yields zero, but SIF file has different eqn
+A["SINVALNE"]=function sinvalne(x::AbstractVector)
     println("Julia port of CUTEST's SINVALNE")
     grad = zeros(size(x))
     term1=x[2]-sin(x[1])
@@ -838,7 +834,7 @@ function sinvalne(x::AbstractVector)
     return sum#, grad
 end
 
-function cosine(x::AbstractVector)
+A["COSINE"]=function cosine(x::AbstractVector)
     println("Julia port of CUTEST's COSINE")
     grad = zeros(size(x))
     sum=0
@@ -849,7 +845,7 @@ function cosine(x::AbstractVector)
     return sum#, grad
 end
 
-function sscosine(x::AbstractVector)
+A["SSCOSINE"]=function sscosine(x::AbstractVector)
     println("Julia port of CUTEST's SSCOSINE")
     grad = zeros(size(x))
     sum=0
@@ -863,7 +859,7 @@ function sscosine(x::AbstractVector)
     return sum#, grad
 end
 
-function sineval(x::AbstractVector)
+A["SINEVAL"]=function sineval(x::AbstractVector)
     println("Julia port of CUTEST's SINEVAL")
     grad = zeros(size(x))
     term1=x[2]-sin(x[1])
@@ -872,7 +868,7 @@ function sineval(x::AbstractVector)
     return sum#, grad
 end
 
-function muonsinels(x::AbstractVector)
+A["MUONSINELS"]=function muonsinels(x::AbstractVector)
     println("Julia port of CUTEST's MUONSINELS")
     X=zeros(512)
     Y=zeros(512)
@@ -1911,8 +1907,8 @@ function muonsinels(x::AbstractVector)
     return sum#, grad
 end
 
-#PROBLEM CHILD!
-function scosine(x::AbstractVector)
+#follows SIF file, doesn't match CUTEst twin
+A["SCOSINE"]=function scosine(x::AbstractVector)
     println("Julia port of CUTEST's SCOSINE")
     grad = zeros(size(x))
     sum=0
@@ -1926,7 +1922,8 @@ function scosine(x::AbstractVector)
     return sum#, grad
 end
 
-function sinquad(x::AbstractVector)
+#follows SIF file, doesn't match CUTEst twin
+A["SINQUAD"]=function sinquad(x::AbstractVector)
     println("Julia port of CUTEST's SINQUAD")
     grad = zeros(size(x))
     term1 = (x[1]-1)^4
@@ -1940,7 +1937,7 @@ function sinquad(x::AbstractVector)
     return sum#, grad
 end
 
-function cliff(x::AbstractVector)
+A["CLIFF"]=function cliff(x::AbstractVector)
     println("Julia port of CUTEST's CLIFF")
     grad = zeros(size(x))
     term1=(0.01*x[1]-0.03)^2
@@ -1950,7 +1947,7 @@ function cliff(x::AbstractVector)
     return sum#, grad
 end
 
-function eg2(x::AbstractVector)
+A["EG2"]=function eg2(x::AbstractVector)
     println("Julia port of CUTEST's EG2")
     grad = zeros(size(x))
     sum=0.5*sin(x[length(x)]^2)
@@ -1961,7 +1958,7 @@ function eg2(x::AbstractVector)
     return sum#, grad
 end
 
-function exp2(x::AbstractVector)
+A["EXP2"]=function exp2(x::AbstractVector)
     println("Julia port of CUTEST's EXP2")
     grad = zeros(size(x))
     sum=0
@@ -1973,18 +1970,18 @@ function exp2(x::AbstractVector)
     return sum#, grad
 end
 
-function cube(x::AbstractVector)
+A["CUBE"]=function cube(x::AbstractVector)
     println("Julia port of CUTEST's CUBE")
     grad = zeros(size(x))
     sum=(x[1]-1)^2
     for i = 2:(length(x))
-        term1 = x[i]^2-x[i-1]^3
+        term1 = x[i]-x[i-1]^3
         sum = sum + 100*(term1)^2
     end
     return sum#, grad
 end
 
-function gaussian(x::AbstractVector)
+A["GAUSSIAN"]=function gaussian(x::AbstractVector)
     println("Julia port of CUTEST's GAUSSIAN")
     grad = zeros(size(x))
     sum=0
@@ -2012,7 +2009,7 @@ function gaussian(x::AbstractVector)
     return sum#, grad
 end
 
-function humps(x::AbstractVector)
+A["HUMPS"]=function humps(x::AbstractVector)
     println("Julia port of CUTEST's HUMPS")
     grad = zeros(size(x))
     sum=0
@@ -2021,168 +2018,35 @@ function humps(x::AbstractVector)
     return sum#, grad
 end
 
-len[1]=100000
-x=ones(100000)
-sumArray[1] = oscigrad(x)
-len[2]=3
-x=ones(3)
-sumArray[2] = box3(x)
-len[3]=500
-x=ones(500)
-sumArray[3] = oscipath(x)
-len[4]=10000
-x=ones(10000)
-sumArray[4] = box(x)
-len[5]=2
-x=ones(2)
-sumArray[5] = boxbodls(x)
-len[6]=20000
-x=ones(20000)
-sumArray[6] = boxpower(x)
-len[7]=3
-x=ones(3)
-sumArray[7] = engval2(x)
-len[8]=5000
-x=ones(5000)
-sumArray[8] = engval1(x)
-len[9]=2
-x=ones(2)
-sumArray[9] = rosenbr(x)
-len[10]=5000
-x=ones(5000)
-sumArray[10] = srosenbr(x)
-len[11]=2
-x=ones(2)
-sumArray[11] = rosenbrtu(x)
-len[12]=500
-x=ones(500)
-sumArray[12] = genrose(x)
-len[13]=10000
-x=ones(10000)
-sumArray[13] = power(x)
-len[14]=1000
-x=ones(1000)
-sumArray[14] = fletchcr(x)
-len[15]=1000
-x=ones(1000)
-sumArray[15] = extrosnb(x)
-len[16]=4
-x=ones(4)
-sumArray[16] = roszman1ls(x)
-len[17]=3000
-x=ones(3000)
-sumArray[17] = dixmaani(x)
-len[18]=5000
-x=ones(5000)
-sumArray[18] = liarwhd(x)
-len[19]=5000
-x=ones(5000)
-sumArray[19] = schmvett(x)
-len[20]=98
-x=ones(98)
-sumArray[20] = luksan13ls(x)
-len[21]=2
-x=ones(2)
-sumArray[21] = judge(x)
-len[22]=5000
-x=ones(5000)
-sumArray[22] = nondia(x)
-len[23]=3000
-x=ones(3000)
-sumArray[23] = dixmaanj(x)
-len[24]=3000
-x=ones(3000)
-sumArray[24] = dixmaanc(x)
-len[25]=3000
-x=ones(3000)
-sumArray[25] = dixmaanl(x)
-len[26]=3000
-x=ones(3000)
-sumArray[26] = dixmaank(x)
-len[27]=3000
-x=ones(3000)
-sumArray[27] = dixmaang(x)
-len[28]=3000
-x=ones(3000)
-sumArray[28] = dixmaanf(x)
-len[29]=3000
-x=ones(3000)
-sumArray[29] = dixmaane(x)
-len[30]=3000
-x=ones(3000)
-sumArray[30] = dixmaanp(x)
-len[31]=3000
-x=ones(3000)
-sumArray[31] = dixmaanh(x)
-len[32]=3000
-x=ones(3000)
-sumArray[32] = dixmaanb(x)
-len[33]=3000
-x=ones(3000)
-sumArray[33] = dixmaann(x)
-len[34]=3000
-x=ones(3000)
-sumArray[34] = dixmaana(x)
-len[35]=3000
-x=ones(3000)
-sumArray[35] = dixmaano(x)
-len[36]=3000
-x=ones(3000)
-sumArray[36] = dixmaanm(x)
-len[37]=3000
-x=ones(3000)
-sumArray[37] = dixmaand(x)
-len[38]=2
-x=ones(2)
-sumArray[38] = sinvalne(x)
-len[39]=10000
-x=ones(10000)
-sumArray[39] = cosine(x)
-len[40]=5000
-x=ones(5000)
-sumArray[40] = sscosine(x)
-len[41]=2
-x=ones(2)
-sumArray[41] = sineval(x)
-len[42]=1
-x=ones(1)
-sumArray[42] = muonsinels(x)
-len[43]=5000
-x=ones(5000)
-sumArray[43] = scosine(x)
-len[44]=5000
-x=ones(5000)
-sumArray[44] = sinquad(x)
-len[45]=2
-x=ones(2)
-sumArray[45] = cliff(x)
-len[46]=1000
-x=ones(1000)
-sumArray[46] = eg2(x)
-len[47]=2
-x=ones(2)
-sumArray[47] = exp2(x)
-len[48]=2
-x=ones(2)
-sumArray[48] = cube(x)
-len[49]=3
-x=ones(3)
-sumArray[49] = gaussian(x)
-len[50]=2
-x=ones(2)
-sumArray[50] = humps(x)
+problemVector = collect(keys(A))
+sumArray = zeros(length(problemVector))
+gradArray=zeros(length(problemVector))
+B = Dict("OSCIGRAD"=>100000,"BOX3"=>3,"OSCIPATH"=>500,"BOX"=>10000,"BOXBODLS"=>2,"BOXPOWER"=>20000,"ENGVAL2"=>3,"ENGVAL1"=>5000,"ROSENBR"=>2,"SROSENBR"=>5000,"ROSENBRTU"=>2,"GENROSE"=>500,"POWER"=>10000,"FLETCHCR"=>1000,"EXTROSNB"=>1000,"ROSZMAN1LS"=>4,"DIXMAANI"=>3000,"LIARWHD"=>5000,"SCHMVETT"=>5000,"LUKSAN13LS"=>98,"JUDGE"=>2,"NONDIA"=>5000,"DIXMAANJ"=>3000,"DIXMAANC"=>3000,"DIXMAANL"=>3000,"DIXMAANK"=>3000,"DIXMAANG"=>3000,"DIXMAANF"=>3000,"DIXMAANE"=>3000,"DIXMAANP"=>3000,"DIXMAANH"=>3000,"DIXMAANB"=>3000,"DIXMAANN"=>3000,"DIXMAANA"=>3000,"DIXMAANO"=>3000,"DIXMAANM"=>3000,"DIXMAAND"=>3000,"SINVALNE"=>2,"COSINE"=>10000,"SSCOSINE"=>5000,"SINEVAL"=>2,"MUONSINELS"=>1,"SCOSINE"=>5000,"SINQUAD"=>5000,"CLIFF"=>2,"EG2"=>1000,"EXP2"=>2,"CUBE"=>2,"GAUSSIAN"=>3,"HUMPS"=>2)
+z=rand(1:10,10^8)
+println(problemVector)
 
-function unitTesting(problemVector,sumArray,gradArray,len)
+for i =1:length(problemVector)
+    prob=problemVector[i]
+    y=B[prob]
+    println(string(y)*prob)
+    soln=(A[prob](ones(y)))
+    println(soln)
+end
+
+function unitTesting(problemVector,sumArray,gradArray,z)
     sumArraySIF = ones(length(problemVector))
     gradArraySIF = ones(length(problemVector))
     for i = 1:length(problemVector)
-        temp=convert(Int64,len[i])
-        x=ones(temp)
         problem = problemVector[i]
+        lens=B[problem]
+        x=z[1:lens]
+        #x=ones(lens)
+        temp=A[problem](x)
+        sumArray[i]=temp
         println("Working on: "*problem)
         nlp = CUTEstModel(problem, verbose=false)
         fx = obj(nlp, x)
-        gx = grad(nlp, x)
+        #gx = grad(nlp, x)
         finalize(nlp)
         fx = convert(Float64,fx)
         #gx = convert(Array{Float64},gx)
@@ -2203,6 +2067,6 @@ function unitTesting(problemVector,sumArray,gradArray,len)
     end
 end
 
-#unitTesting(problemVector,sumArray,gradArray,len)
+unitTesting(problemVector,sumArray,gradArray,z)
 
-# end
+end
