@@ -1,9 +1,9 @@
-module Wrapper
+# module Wrapper
 
-export wrapfun
-#ALL GOOD
-using CUTEst
-using NLPModels
+# export wrapfun
+# #ALL GOOD
+# using CUTEst
+# using NLPModels
 
 A = Dict{String,Function}()
 
@@ -651,12 +651,10 @@ A["MEYER3"]=function meyer3(x::AbstractVector)
     G[15]=3307.0
     G[16]=2872.0
     x[1]=100*x[1]
-    x[2]=10^(-4)*x[2]
-    x[3]=0.01*x[3]
     for i = 1:16
         term1 = -G[i]
         coeff=45+5*i
-        term2 = x[1]*exp(x[2]/(coeff+x[3]))
+        term2 = x[1]*exp(0.0001*x[2]/(coeff+0.01*x[3]))
         sum = sum+(term1+term2)^2
     end
     return sum#, grad
@@ -700,7 +698,7 @@ A["INDEF"]=function indef(x::AbstractVector)
     sum = 0
     for i = 1:N
         term1 = x[i]
-        sum = sum +term1^2
+        sum = sum +term1
     end
     for i = 2:(N-1)
         term1 = 2*x[i]-x[N]-x[1]
@@ -823,7 +821,7 @@ A["STRTCHDV"]=function strtchdv(x::AbstractVector)
     M=N-1
     sum=0
     for i = 1:M
-        Y = x[1]^2+x[2]^2
+        Y = x[i]^2+x[i+1]^2
         A = Y^0.125
         S = sin(50*Y^0.1)
         B = 1+S
@@ -971,8 +969,8 @@ A["NONCVXUN"]=function noncvxun(x::AbstractVector)
     N=5000
     sum=0
     for i = 1:N
-        term1 = (x[i]+2*x[1])^2
-        term2 = 4*cos(x[i]+2*x[1])
+        term1 = (x[i]+x[mod(2*i-1,N)+1]+x[mod(3*i-1,N)+1])^2
+        term2 = 4*cos(x[i]+x[mod(2*i-1,N)+1]+x[mod(3*i-1,N)+1])
         sum = sum + term1+term2
     end
     return sum#, grad
@@ -3518,7 +3516,7 @@ A["DENSCHNF"]=function denschnf(x::AbstractVector)
     sum=0
     term = -8+2*(x[1]+x[2])^2+(x[1]-x[2])^2
     term1 = -9+5*x[1]^2+(x[2]-3)^2
-    sum = sum + (term+term1)^2
+    sum = sum + term^2+term1^2
     return sum#, grad
 end
 
@@ -3529,7 +3527,7 @@ A["DENSCHNA"]=function denschna(x::AbstractVector)
     term1 = x[1]
     term2 = x[1]+x[2]
     term3 = -1+exp(x[2])
-    sum = sum + term1^2+term2^2+term3^2
+    sum = sum + term1^4+term2^2+term3^2
     return sum#, grad
 end
 
@@ -3558,7 +3556,7 @@ A["DENSCHND"]=function denschnd(x::AbstractVector)
     println("Julia port of CUTEST's DENSCHND")
     grad = zeros(size(x))
     sum=0
-    term1 = x[1]+x[2]^3-x[3]^4
+    term1 = x[1]^2+x[2]^3-x[3]^4
     term2 = 2*(x[1]*x[2]*x[3])
     term3 = 2*x[1]*x[2]-3*x[3]*x[2]+x[1]*x[3]
     sum = sum + term1^2+term2^2+term3^2
@@ -3719,4 +3717,56 @@ A["FREUROTH"]=function freuroth(x::AbstractVector)
     return sum#, grad
 end
 
+B=Dict("KOWOSB"=>4,"NONCVXUN"=>5000,"BIGGS6"=>6,"OSBORNEA"=>5,"TOINTGSS"=>5000,"ECKERLE4LS"=>3,"EXPFIT"=>2,"CLUSTERLS"=>2,"THURBERLS"=>7,"BRKMCC"=>2,"RAT42LS"=>3,"SNAIL"=>2,"RAT43LS"=>4,"HATFLDE"=>3,"ALLINITU"=>4,"ARWHEAD"=>5000,"NCB20"=>5010,"SENSORS"=>100,"INDEF"=>5000,"HATFLDD"=>3,"CHNRSNBM"=>50,"CHWIRUT2LS"=>3,"TRIDIA"=>5000,"MODBEALE"=>20000,"MEYER3"=>3,"LSC1LS"=>3,"GROWTHLS"=>3,"FLETBV3M"=>5000,"NCB20B"=>5000,"JENSMP"=>2,"STRTCHDV"=>10,"VARDIM"=>200,"BEALE"=>2,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>30,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>1667^2,"HYDCAR6LS"=>29,"SPINLS"=>2602,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5,"HIMMELBB"=>2,"HIMMELBH"=>2,"ZANGWIL2"=>2,"LSC1LS"=>3,"GAUSS2LS"=>8,"PALMER6C"=>8,"LUKSAN14LS"=>98,"PRICE4"=>2,"MGH10SLS"=>16,"PALMER2C"=>8,"HAIRY"=>2,"MISRA1BLS"=>2,"GENHUMPS"=>5000,"DENSCHNC"=>2,"ARGLINA"=>200,"HIMMELBCLS"=>2,"DENSCHND"=>3,"MARATOSB"=>2,"LSC2LS"=>3,"SISSER"=>2,"PALMER1C"=>8,"CYCLOOCFLS"=>29996,"MISRA1DLS"=>2,"TRIGON1"=>10,"S308"=>2,"MISRA1ALS"=>2,"S308NE"=>2,"HIMMELBG"=>2,"LUKSAN21LS"=>100,"SPIN2LS"=>102,"PALMER5C"=>6,"SBRYBND"=>5000,"ARGLINC"=>200,"FREUROTH"=>5000,"PALMER8C"=>8,"MGH17LS"=>5,"LUKSAN22LS"=>100,"DENSCHNB"=>2,"DENSCHNF"=>2,"DENSCHNA"=>2,"PALMER1D"=>7,"GAUSS3LS"=>8,"HIMMELBF"=>4,"PRICE3"=>2,"MGH09LS"=>4,"PALMER7C"=>8,"PALMER5D"=>4,"GAUSS1LS"=>8,"LUKSAN12LS"=>98)
+problemVector = collect(keys(A))
+sumArray = ones(length(problemVector))
+gradArray=zeros(length(problemVector))
+z=rand(1:10,10^8)
+println(problemVector)
+println(length(problemVector))
+
+for i =1:length(problemVector)
+    prob=problemVector[i]
+    y=B[prob]
+    println(string(y)*prob)
+    soln=(A[prob](ones(y)))
+    println(soln)
 end
+
+# function unitTesting(problemVector,sumArray,gradArray,z)
+#     sumArraySIF = ones(length(problemVector))
+#     gradArraySIF = ones(length(problemVector))
+#     for i = 1:length(problemVector)
+#         problem = problemVector[i]
+#         lens=B[problem]
+#         x=z[1:lens]
+#         x=ones(lens)
+#         temp=A[problem](x)
+#         sumArray[i]=temp
+#         println("Working on: "*problem)
+#         nlp = CUTEstModel(problem, verbose=false)
+#         fx = obj(nlp, x)
+#         #gx = grad(nlp, x)
+#         finalize(nlp)
+#         fx = convert(Float64,fx)
+#         #gx = convert(Array{Float64},gx)
+#         sumArraySIF[i] = fx
+#         #gradArraySIF[i] = gx
+#     end
+#     for i = 1:length(problemVector)
+#         if sumArray[i]-sumArraySIF[i] != 0
+#             println("Issue with sum: " * problemVector[i])
+#             println(sumArray[i])
+#             println(sumArraySIF[i])
+#             # println(x)
+#         end
+#         # if gradArray[i]-gradArraySIF[i] != 0
+#         #     println("grad: " * problemVector[i])
+#         #     # println(x)
+#         # end
+#     end
+# end
+
+# unitTesting(problemVector,sumArray,gradArray,z)
+
+# end
