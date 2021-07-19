@@ -863,7 +863,7 @@ A["SINEVAL"]=function sineval(x::AbstractVector)
     println("Julia port of CUTEST's SINEVAL")
     grad = zeros(size(x))
     term1=x[2]-sin(x[1])
-    term2=x[2]
+    term2=x[1]
     sum=1000*term1^2+0.25*term2^2
     return sum#, grad
 end
