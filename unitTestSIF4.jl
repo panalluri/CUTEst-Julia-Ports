@@ -1,12 +1,13 @@
-# module Wrapper
+module Wrapper
 
-# export wrapfun
+export wrapfun
 #ALL GOOD -- SET4
-# using CUTEst
-# using NLPModels
+using CUTEst
+using NLPModels
 
 A = Dict{String,Function}()
 
+#vary in hundreths place
 A["FBRAIN3LS"]=function fbrain3ls(x::AbstractVector)
     println("Julia port of CUTEST's FBRAIN3LS")
    
@@ -11099,7 +11100,7 @@ A["FBRAIN3LS"]=function fbrain3ls(x::AbstractVector)
             sum = sum +(a+b+c+d+e+f-C[i,j])^2
         end
     end
-    return sum, grad
+    return sum#, grad
 end
 
 A["VESUVIOLS"]=function vesuviols(x::AbstractVector)
@@ -75365,6 +75366,7 @@ A["GULF"]=function gulf(x::AbstractVector)
     return sum#, grad
 end
 
+#vary in hundreths place
 A["TOINTPSP"]=function tointpsp(x::AbstractVector)
     println("Julia port of CUTEST's TOINTPSP")
     grad = zeros(size(x))
@@ -75541,6 +75543,7 @@ A["TOINTPSP"]=function tointpsp(x::AbstractVector)
     return sum#, grad
 end
 
+#incorrect value
 A["TOINTQOR"]=function tointqor(x::AbstractVector)
     println("Julia port of CUTEST's TOINTQOR")
     grad = zeros(size(x))
@@ -75675,7 +75678,7 @@ A["TOINTQOR"]=function tointqor(x::AbstractVector)
     GB[1]=-x[31]+x[1]
     GB[2]=-x[1]+x[2]+x[3]
     GB[3]=-x[2]+x[4]+x[5]
-    GB[4]=-x[2]+x[6]+x[7]
+    GB[4]=-x[4]+x[6]+x[7]
     GB[5]=-x[6]+x[8]+x[9]
     GB[6]=-x[8]+x[10]+x[11]
     GB[7]=-x[10]+x[12]+x[13]
@@ -75711,6 +75714,7 @@ A["TOINTQOR"]=function tointqor(x::AbstractVector)
     return sum#, grad
 end
 
+#incorrect value
 A["TOINTGOR"]=function tointgor(x::AbstractVector)
     println("Julia port of CUTEST's TOINTGOR")
     grad = zeros(size(x))
@@ -75845,7 +75849,7 @@ A["TOINTGOR"]=function tointgor(x::AbstractVector)
     GB[1]=-x[31]+x[1]
     GB[2]=-x[1]+x[2]+x[3]
     GB[3]=-x[2]+x[4]+x[5]
-    GB[4]=-x[2]+x[6]+x[7]
+    GB[4]=-x[4]+x[6]+x[7]
     GB[5]=-x[6]+x[8]+x[9]
     GB[6]=-x[8]+x[10]+x[11]
     GB[7]=-x[10]+x[12]+x[13]
@@ -75879,9 +75883,11 @@ A["TOINTGOR"]=function tointgor(x::AbstractVector)
         A = GB[i]-D[i]
         LAT = log(1+abs(A))
         if A>=0
-            TPOS = max(1,0)
+            C=A
+            TPOS = max(C,0)
         else
-            TPOS = max(-1,0)
+            C=-A
+            TPOS = max(C,0)
         end
         TNEG = 1-TPOS
         sum = sum + BETA[i]*(A)^2*(TNEG+TPOS*LAT)
@@ -76253,6 +76259,7 @@ A["ENSOLS"]=function ensols(x::AbstractVector)
     return sum#, grad
 end
 
+#incorrect value, despite matching SIF file
 A["HAHN1LS"]=function hahn1ls(x::AbstractVector)
     println("Julia port of CUTEST's HAHN1LS")
     grad = zeros(size(x))
@@ -76734,7 +76741,7 @@ A["HAHN1LS"]=function hahn1ls(x::AbstractVector)
     Y[234]=21.074
     Y[235]=21.085
     Y[236]=20.935
-    for i = 1:N
+    for i = 1:M
         term1 = -Y[i]
         T = x[1] + x[2] * X[i] + x[3] * X[i]^2 + x[4] * X[i]^3
         D = 1 + x[5] * X[i] + x[6] * X[i]^2 + x[7] * X[i]^3
@@ -76760,40 +76767,40 @@ for i =1:length(problemVector)
     println(soln)
 end
 
-# function unitTesting(problemVector,sumArray,gradArray,z)
-#     sumArraySIF = ones(length(problemVector))
-#     gradArraySIF = ones(length(problemVector))
-#     for i = 1:length(problemVector)
-#         problem = problemVector[i]
-#         lens=B[problem]
-#         x=z[1:lens]
-#         x=lens
-#         temp=A[problem](x)
-#         sumArray[i]=temp
-#         println("Working on: "*problem)
-#         nlp = CUTEstModel(problem, verbose=false)
-#         fx = obj(nlp, x)
-#         #gx = grad(nlp, x)
-#         finalize(nlp)
-#         fx = convert(Float64,fx)
-#         #gx = convert(Array{Float64},gx)
-#         sumArraySIF[i] = fx
-#         #gradArraySIF[i] = gx
-#     end
-#     for i = 1:length(problemVector)
-#         if sumArray[i]-sumArraySIF[i] != 0
-#             println("Issue with sum: " * problemVector[i])
-#             println(sumArray[i])
-#             println(sumArraySIF[i])
-#             # println(x)
-#         end
-#         # if gradArray[i]-gradArraySIF[i] != 0
-#         #     println("grad: " * problemVector[i])
-#         #     # println(x)
-#         # end
-#     end
-# end
+function unitTesting(problemVector,sumArray,gradArray,z)
+    sumArraySIF = ones(length(problemVector))
+    gradArraySIF = ones(length(problemVector))
+    for i = 1:length(problemVector)
+        problem = problemVector[i]
+        lens=B[problem]
+        x=z[1:lens]
+        #x=ones(lens)
+        temp=A[problem](x)
+        sumArray[i]=temp
+        println("Working on: "*problem)
+        nlp = CUTEstModel(problem, verbose=false)
+        fx = obj(nlp, x)
+        #gx = grad(nlp, x)
+        finalize(nlp)
+        fx = convert(Float64,fx)
+        #gx = convert(Array{Float64},gx)
+        sumArraySIF[i] = fx
+        #gradArraySIF[i] = gx
+    end
+    for i = 1:length(problemVector)
+        if sumArray[i]-sumArraySIF[i] != 0
+            println("Issue with sum: " * problemVector[i])
+            println(sumArray[i])
+            println(sumArraySIF[i])
+            # println(x)
+        end
+        # if gradArray[i]-gradArraySIF[i] != 0
+        #     println("grad: " * problemVector[i])
+        #     # println(x)
+        # end
+    end
+end
 
-# unitTesting(problemVector,sumArray,gradArray,z)
+unitTesting(problemVector,sumArray,gradArray,z)
 
-# end
+end
