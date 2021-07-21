@@ -75543,7 +75543,7 @@ A["TOINTPSP"]=function tointpsp(x::AbstractVector)
     return sum#, grad
 end
 
-#incorrect value
+#vary in hundreths place
 A["TOINTQOR"]=function tointqor(x::AbstractVector)
     println("Julia port of CUTEST's TOINTQOR")
     grad = zeros(size(x))
@@ -75714,7 +75714,7 @@ A["TOINTQOR"]=function tointqor(x::AbstractVector)
     return sum#, grad
 end
 
-#incorrect value
+#vary in hundreths place
 A["TOINTGOR"]=function tointgor(x::AbstractVector)
     println("Julia port of CUTEST's TOINTGOR")
     grad = zeros(size(x))
@@ -75882,12 +75882,11 @@ A["TOINTGOR"]=function tointgor(x::AbstractVector)
     for i = 1:33
         A = GB[i]-D[i]
         LAT = log(1+abs(A))
+        TPOS=0
         if A>=0
-            C=A
-            TPOS = max(C,0)
+            TPOS = max(1,0)
         else
-            C=-A
-            TPOS = max(C,0)
+            TPOS = max(-1,0)
         end
         TNEG = 1-TPOS
         sum = sum + BETA[i]*(A)^2*(TNEG+TPOS*LAT)
