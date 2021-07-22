@@ -1,9 +1,9 @@
-module Wrapper
+# module Wrapper
 
-export wrapfun
+# export wrapfun
 
-using CUTEst
-using NLPModels
+# using CUTEst
+# using NLPModels
 
 A = Dict{String,Function}()
 
@@ -2033,40 +2033,40 @@ for i =1:length(problemVector)
     println(soln)
 end
 
-function unitTesting(problemVector,sumArray,gradArray,z)
-    sumArraySIF = ones(length(problemVector))
-    gradArraySIF = ones(length(problemVector))
-    for i = 1:length(problemVector)
-        problem = problemVector[i]
-        lens=B[problem]
-        x=z[1:lens]
-        #x=ones(lens)
-        temp=A[problem](x)
-        sumArray[i]=temp
-        println("Working on: "*problem)
-        nlp = CUTEstModel(problem, verbose=false)
-        fx = obj(nlp, x)
-        #gx = grad(nlp, x)
-        finalize(nlp)
-        fx = convert(Float64,fx)
-        #gx = convert(Array{Float64},gx)
-        sumArraySIF[i] = fx
-        #gradArraySIF[i] = gx
-    end
-    for i = 1:length(problemVector)
-        if sumArray[i]-sumArraySIF[i] != 0
-            println("Issue with sum: " * problemVector[i])
-            println(sumArray[i])
-            println(sumArraySIF[i])
-            # println(x)
-        end
-        # if gradArray[i]-gradArraySIF[i] != 0
-        #     println("grad: " * problemVector[i])
-        #     # println(x)
-        # end
-    end
-end
+# function unitTesting(problemVector,sumArray,gradArray,z)
+#     sumArraySIF = ones(length(problemVector))
+#     gradArraySIF = ones(length(problemVector))
+#     for i = 1:length(problemVector)
+#         problem = problemVector[i]
+#         lens=B[problem]
+#         x=z[1:lens]
+#         #x=ones(lens)
+#         temp=A[problem](x)
+#         sumArray[i]=temp
+#         println("Working on: "*problem)
+#         nlp = CUTEstModel(problem, verbose=false)
+#         fx = obj(nlp, x)
+#         #gx = grad(nlp, x)
+#         finalize(nlp)
+#         fx = convert(Float64,fx)
+#         #gx = convert(Array{Float64},gx)
+#         sumArraySIF[i] = fx
+#         #gradArraySIF[i] = gx
+#     end
+#     for i = 1:length(problemVector)
+#         if sumArray[i]-sumArraySIF[i] != 0
+#             println("Issue with sum: " * problemVector[i])
+#             println(sumArray[i])
+#             println(sumArraySIF[i])
+#             # println(x)
+#         end
+#         # if gradArray[i]-gradArraySIF[i] != 0
+#         #     println("grad: " * problemVector[i])
+#         #     # println(x)
+#         # end
+#     end
+# end
 
-unitTesting(problemVector,sumArray,gradArray,z)
+# unitTesting(problemVector,sumArray,gradArray,z)
 
-end
+# end

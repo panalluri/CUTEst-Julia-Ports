@@ -3590,6 +3590,308 @@ A["LSC2LS"]=function lsc2ls(x::AbstractVector)
     return sum#, grad
 end
 
+#problem
+A["CYCLOOCFLS"]=function cycloocfls(a::AbstractVector)
+    println("Julia port of CUTEST's CYCLOOCFLS")
+    P=10000
+    x=zeros(P)
+    y=zeros(P)
+    z=zeros(P)
+    x[3:P]=a[3:P]
+    y[3:P]=a[(P+1):(2*P-2)]
+    z[3:P]=a[(2*P+1-2):(length(a))]
+    y[2]=a[1]
+    z[2]=a[2]
+    M=-2*(P)/(2*(P)-2)
+    term1 = -1+y[2]^2+z[2]^2
+    term2 = M+x[3]^2+y[3]^2+z[3]^2
+    term3 = -1+x[3]^2+(y[2]-y[3])^2+(z[2]-z[3])^2
+    term4 = M+x[4]^2+(y[2]-y[4])^2+(z[2]-z[4])^2
+    term5 = -1+x[P]^2+y[P]^2+z[P]^2
+    term6 = M+x[P-1]^2+y[P-1]^2+z[P-1]^2
+    term7 = M+x[P]^2+(y[P]-y[2])^2+(z[P]-z[2])^2
+    term8 = -1+(x[P-1]-x[P])^2+(y[P-1]-y[P])^2+(z[P-1]-z[P])^2
+    sum=term1^2+term2^2+term3^2+term4^2+term5^2+term7^2+term6^2+term8^2
+    for i = 3:(P-2)
+        termA = -1+(x[i]-x[i+1])^2+(y[i]-y[i+1])^2+(z[i]-z[i+1])^2
+        termB = M+(x[i]-x[i+2])^2+(y[i]-y[i+2])^2+(z[i]-z[i+2])^2
+        sum = sum+termA^2+termB^2
+    end
+    return sum
+end
+
+A["SPIN2LS"]=function spin2ls(a::AbstractVector)
+    println("Julia port of CUTEST's SPIN2LS")
+    sum=0
+    N=50
+    x=zeros(N)
+    y=zeros(N)
+    mu=a[1]
+    om=a[2]
+    x=a[3:(2+N)]
+    y=a[(2+N+1):length(a)]
+    for i = 1:N
+        term1 = -mu*x[i]
+        term2 = om*y[i]
+        term3 = -mu*y[i]
+        term4 = om*x[i]
+        sum1 = term1+term2
+        sum2 = term3+term4
+        for j = 1:(i-1)
+            termA = (y[i]-y[j])/((y[i]-y[j])^2+(x[i]-x[j])^2)
+            sum1 = sum1 + termA
+            termB = (x[i]-x[j])/((y[i]-y[j])^2+(x[i]-x[j])^2)
+            sum2 = sum2 + termB
+        end
+        for j = (i+1):N
+            termA = (y[i]-y[j])/((y[i]-y[j])^2+(x[i]-x[j])^2)
+            sum1 = sum1 + termA
+            termB = (x[i]-x[j])/((y[i]-y[j])^2+(x[i]-x[j])^2)
+            sum2 = sum2 + termB
+        end
+        sum = sum+sum1^2+sum2^2
+    end
+    return sum
+end
+
+#problem
+A["LUKSAN22LS"]=function luksan22ls(x::AbstractVector)
+    println("Julia port of CUTEST's LUKSAN22LS")
+    grad = zeros(size(x))
+    N=100
+    E=zeros(N*N)
+    E[1]=x[1]-1
+    sum=0
+    k=2
+    for i =1:(N-2)
+      E[k]= -10*x[i+1]+10*x[i]^2
+      E[k+1]=2*exp(-(x[i]-x[i+1])^2)+exp(-2*(x[i+1]-x[i+2])^2)
+      k=k+2
+    end
+    E[k] = -10*x[N]+10^x[N-1]^2
+    for i =1:N
+        sum=sum+E[i]^2
+      end
+    return sum#, grad
+end
+
+A["DENSCHND"]=function denschnd(x::AbstractVector)
+    println("Julia port of CUTEST's DENSCHND")
+    grad = zeros(size(x))
+    sum=0
+    term1 = x[1]+x[2]^3-x[3]^4
+    term2 = 2*(x[1]*x[2]*x[3])
+    term3 = 2*x[1]*x[2]-3*x[3]*x[2]+x[1]*x[3]
+    sum = sum + term1^2+term2^2+term3^2
+    return sum#, grad
+end
+
+A["MGH17LS"]=function mgh17ls(x::AbstractVector)
+    println("Julia port of CUTEST's MGH17LS")
+    M=33
+    N=5
+    X=zeros(M)
+    Y=zeros(M)
+    X[1]=0.0E+0
+    X[2]=1.0E+1
+    X[3]=2.0E+1
+    X[4]=3.0E+1
+    X[5]=4.0E+1
+    X[6]=5.0E+1
+    X[7]=6.0E+1
+    X[8]=7.0E+1
+    X[9]=8.0E+1
+    X[10]=9.0E+1
+    X[11]=1.0E+2
+    X[12]=1.1E+2
+    X[13]=1.2E+2
+    X[14]=1.3E+2
+    X[15]=1.4E+2
+    X[16]=1.5E+2
+    X[17]=1.6E+2
+    X[18]=1.7E+2
+    X[19]=1.8E+2
+    X[20]=1.9E+2
+    X[21]=2.0E+2
+    X[22]=2.1E+2
+    X[23]=2.2E+2
+    X[24]=2.3E+2
+    X[25]=2.4E+2
+    X[26]=2.5E+2
+    X[27]=2.6E+2
+    X[28]=2.7E+2
+    X[29]=2.8E+2
+    X[30]=2.9E+2
+    X[31]=3.0E+2
+    X[32]=3.1E+2
+    X[33]=3.2E+2
+
+    Y[1]=8.44E-1
+    Y[2]=9.08E-1
+    Y[3]=9.32E-1
+    Y[4]=9.36E-1
+    Y[5]=9.25E-1
+    Y[6]=9.08E-1
+    Y[7]=8.81E-1
+    Y[8]=8.50E-1
+    Y[9]=8.18E-1
+    Y[10]=7.84E-1
+    Y[11]=7.51E-1
+    Y[12]=7.18E-1
+    Y[13]=6.85E-1
+    Y[14]=6.58E-1
+    Y[15]=6.28E-1
+    Y[16]=6.03E-1
+    Y[17]=5.80E-1
+    Y[18]=5.58E-1
+    Y[19]=5.38E-1
+    Y[20]=5.22E-1
+    Y[21]=5.06E-1
+    Y[22]=4.90E-1
+    Y[23]=4.78E-1
+    Y[24]=4.67E-1
+    Y[25]=4.57E-1
+    Y[26]=4.48E-1
+    Y[27]=4.38E-1
+    Y[28]=4.31E-1
+    Y[29]=4.24E-1
+    Y[30]=4.20E-1
+    Y[31]=4.14E-1
+    Y[32]=4.11E-1
+    Y[33]=4.06E-1
+    sum = 0
+    for i = 1:M
+        term1 = x[1]-Y[i]
+        term2 = x[2]*exp(-x[4]*X[i])
+        term3 = x[3]*exp(-x[5]*X[i])
+        sum=sum +(term1+term2+term3)^2
+    end
+    return sum
+end
+
+#problems
+A["SISSER"]=function sisser(x::AbstractVector)
+    println("Julia port of CUTEST's SISSER")
+    grad = zeros(size(x))
+    term1 = x[1]^2
+    term2 = x[1]*x[2]
+    term3 = x[2]^2
+    #WEIRDLY HAD TO CHANGE SIGN ON TERM2 COEFF
+    sum = 3*term1^2+2*term2^2+3*term3^2
+    return sum#, grad
+end
+
+#problems
+A["MGH10SLS"]=function mgh10sls(x::AbstractVector)
+    println("Julia port of CUTEST's MGH10SLS")
+    M=16
+    N=3
+    X=zeros(M)
+    Y=zeros(M)
+    X[1]=5.00E+01
+    X[2]=5.50E+01
+    X[3]=6.00E+01
+    X[4]=6.50E+01
+    X[5]=7.00E+01
+    X[6]=7.50E+01
+    X[7]=8.00E+01
+    X[8]=8.50E+01
+    X[9]=9.00E+01
+    X[10]=9.50E+01
+    X[11]=1.00E+02
+    X[12]=1.05E+02
+    X[13]=1.10E+02
+    X[14]=1.15E+02
+    X[15]=1.20E+02
+    X[16]=1.25E+02
+
+    Y[1]=3.478+04
+    Y[2]=2.861+04
+    Y[3]=2.365+04
+    Y[4]=1.963+04
+    Y[5]=1.637+04
+    Y[6]=1.372+04
+    Y[7]=1.154+04
+    Y[8]=9.744+03
+    Y[9]=8.261+03
+    Y[10]=7.030+03
+    Y[11]=6.005+03
+    Y[12]=5.147+03
+    Y[13]=4.427+03
+    Y[14]=3.820+03
+    Y[15]=3.307+03
+    Y[16]=2.872+03
+    sum = 0
+    for i = 1:M
+        term1 = -Y[i]
+        term2 = x[1]*0.01*exp(1000*x[2]/(X[i]+100*x[3]))
+        sum=sum +(term1+term2)^2
+    end
+    return sum
+end
+
+#problem
+A["ARGLINA"]=function arglina(x::AbstractVector)
+    println("Julia port of CUTEST's ARGLINA")
+    N=200
+    M=400
+    sum=0
+    for i = 1:N
+        sum1=0
+        for j = 1:(i-1)
+            term = x[j]*(-2/M)
+            sum1 = sum1 + term
+        end
+        term = x[i]*(1-2/M)
+        sum1=sum1+term-1
+        for j = (i+1):N
+            term = x[j]*(-2/M)
+            sum1 = sum1 + term
+        end
+        sum = sum+sum1^2
+    end
+    for i = (N+1):M
+        sum1=-1
+        for j = 1:N
+            term = x[j]*(-2/M)
+            sum1 = sum1 + term
+        end
+        sum = sum+sum1^2
+    end
+    return sum
+end
+
+A["LUKSAN14LS"]=function luksan14ls(x::AbstractVector)
+    println("Julia port of CUTEST's LUKSAN14LS")
+    grad = zeros(size(x))
+    sum = 0
+    S = 32
+    i=1
+    for j = 1:S
+      term = -10*x[i+1]+10*x[i]^2
+      term1 = x[i+2]+x[i+1]-2
+      term2 = x[i+3]-1
+      term3 = x[i+4]-1
+      term4 = x[i]+3*x[i+1]
+      term5 = x[i+2]+x[i+3]-2*x[i+4]
+      term6 = -10*x[i+4]+10*x[i+1]^2
+      sum = sum +term^2+ term1^2+term2^2+term3^2+term4^2+term5^2+term6^2
+      i=i+3
+    end
+    return sum#, grad
+end
+
+#problem
+A["S308NE"]=function s308ne(x::AbstractVector)
+    println("Julia port of CUTEST's S308NE")
+    grad = zeros(size(x))
+    term1 = x[1]^2+x[1]*x[2]+x[2]^2
+    term2 = sin(x[1])
+    term3 = cos(x[2])
+    sum = term1+term2+term3
+    return sum#, grad
+end
+
 A["LSC1LS"]=function lsc1ls(x::AbstractVector)
     println("Julia port of CUTEST's LSC1LS")
     grad = zeros(size(x))

@@ -76750,6 +76750,51 @@ A["HAHN1LS"]=function hahn1ls(x::AbstractVector)
     return sum#, grad
 end
 
+#incorrect
+A["MSQRTALS"]=function msqrtals(x::AbstractVector)
+    println("Julia port of CUTEST's MSQRTALS")
+    grad = zeros(size(x))
+    P=32
+    N=P^2
+    sum=0
+    #CONSTZ
+    B =zeros(P,P)
+    A=zeros(P,P)
+    G=zeros(P,P)
+    a=x
+    x=zeros(P,P)
+    for i=1:P
+        x[i,:] = a[1+(i-1)*P,i*P]
+    end
+    k=0
+    for i =1:P
+        for j = 1:P
+            k=k+1
+            B[i,j] = sin(k^2)
+        end
+    end
+    for i =1:P
+        for j = 1:P
+            for k = 1:P
+                A[i,j] = B[i,k]*B[k,j]
+            end
+        end
+    end
+    for i =1:P
+        for j = 1:P
+            G[i,j] = -A[i,j]
+            for t = 1:P
+                G[i,j]=G[i,j]+x[i,t]*x[t,j]
+            end
+        end
+    end
+    for i =1:P
+        for j = 1:P
+            sum = sum+G[i,j]^2
+        end
+    end
+    return sum #, grad
+end
 
 problemVector = collect(keys(A))
 sumArray = ones(length(problemVector))

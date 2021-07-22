@@ -9,6 +9,22 @@ using SpecialFunctions
 A = Dict{String,Function}()
 B=Dict("LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETCHBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>30,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>1667^2,"HYDCAR6LS"=>29,"SPINLS"=>2602,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
 
+A["INDEFM"]=function indefm(x::AbstractVector)
+    println("Julia port of CUTEST's INDEFM")
+    grad = zeros(size(x))
+    N=100000
+    sum=0
+    for i = 1:N
+        term1 = x[i]
+        sum = sum + 100*sin(0.01*term1)
+    end
+    for i = 2:(N-1)
+        term1 = 2*x[i]-x[N]-x[1]
+        sum = sum + 0.5*cos(term1)
+    end
+    return sum#, grad
+end
+
 A["DIXON3DQ"]=function dixon3dq(x::AbstractVector)
     println("Julia port of CUTEST's DIXON3DQ")
     grad = zeros(size(x))
@@ -360,6 +376,120 @@ A["KIRBY2LS"]=function kirby2ls(x::AbstractVector)
         sum=sum+(term1+term2)^2
     end
     return sum #, grad
+end
+
+#PROBELM
+A["INTEQNELS"]=function inteqnels(x::AbstractVector)
+    println("Julia port of CUTEST's INTEQNELS")
+    grad = zeros(size(x))
+    N=500
+    H=1/(N+1)
+    HFH = 0.5*H
+    term1 = x[1]
+    term2 = x[N+2]
+    sum=term1^2+term2^2
+    sum1 = 0
+    for i = 2:(N+1)
+        sum1=0
+        term1 = x[i]
+        for j = 1:i
+            coeff = j*H*HFH*(1-i*H)
+            term = (x[j]+(1+j*H))^3
+            sum1 = sum1 + coeff*term
+        end
+        for j = (i+1):N
+            coeff = i*HFH*(1-j*H)*H
+            term = (x[j]+(1+j*H))^3
+            sum1 = sum1 + coeff*term
+        end
+        sum = sum + (sum1+term1)^2
+    end
+    return sum#, grad
+end
+
+#PROBLEM
+A["OSBORNEB"]=function osborneb(x::AbstractVector)
+    println("Julia port of CUTEST's OSBORNEB")
+    grad = zeros(size(x))
+    M=65
+    N=11
+    G=zeros(M)
+    G[1]=1.366
+    G[2]=1.191
+    G[3]=1.112
+    G[4]=1.013
+    G[5]=0.991
+    G[6]=0.885
+    G[7]=0.831
+    G[8]=0.847
+    G[9]=0.786
+    G[10]=0.725
+    G[11]=0.746
+    G[12]=0.679
+    G[13]=0.608
+    G[14]=0.655
+    G[15]=0.616
+    G[16]=0.606
+    G[17]=0.602
+    G[18]=0.626
+    G[19]=0.651
+    G[20]=0.724
+    G[21]=0.649
+    G[22]=0.649
+    G[23]=0.694
+    G[24]=0.644
+    G[25]=0.624
+    G[26]=0.661
+    G[27]=0.612
+    G[28]=0.558
+    G[29]=0.533
+    G[30]=0.495
+    G[31]=0.500
+    G[32]=0.423
+    G[33]=0.395
+    G[34]=0.375
+    G[35]=0.372
+    G[36]=0.391
+    G[37]=0.396
+    G[38]=0.405
+    G[39]=0.428
+    G[40]=0.429
+    G[41]=0.523
+    G[42]=0.562
+    G[43]=0.607
+    G[44]=0.653
+    G[45]=0.672
+    G[46]=0.708
+    G[47]=0.633
+    G[48]=0.668
+    G[49]=0.645
+    G[50]=0.632
+    G[51]=0.591
+    G[52]=0.559
+    G[53]=0.597
+    G[54]=0.625
+    G[55]=0.739
+    G[56]=0.710
+    G[57]=0.729
+    G[58]=0.720
+    G[59]=0.636
+    G[60]=0.581
+    G[61]=0.428
+    G[62]=0.292
+    G[63]=0.162
+    G[64]=0.098
+    G[65]=0.054
+    sum=0
+    for i = 1:M
+        T=0.1*(i-1)
+        term1 = -G[i]
+        term2 = x[1]*exp(-T*x[5])
+        term3 = x[2]*exp(-x[6]*(T-x[9])^2)
+        term4 = x[3]*exp(-x[7]*(T-x[10])^2)
+        term5 = x[4]*exp(-x[8]*(T-x[11])^2)
+        sum = sum + (term1+term2+term3+term4+term5)^2
+    end
+    return sum#, grad
 end
 
 #problems
