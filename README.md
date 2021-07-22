@@ -16,3 +16,9 @@ product of most of the codes, while other branches contain works in progress.
 The documentation necessary to read an unconstrained problem from a SIF file is included in a PDF 
 on the main branch. This documentation also works through an example of how to deconstruct a SIF 
 file, as a further resource.
+
+The file JuliaCUTEstModule is a module that can be used to determine the values of the objective 
+functions of various problems. To call a CUTEst problem, use the command CUTEst("ProblemName"), 
+for which the output is the problem name, if the problem is accounted for by the module. Moreover, 
+the command obj("ProblemName",inputVector) outputs the value of the objective function for a 
+given test problem and input vector.
