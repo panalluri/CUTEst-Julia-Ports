@@ -21,4 +21,5 @@ The file JuliaCUTEstModule is a module that can be used to determine the values 
 functions of various problems. To call a CUTEst problem, use the command CUTEst("ProblemName"), 
 for which the output is the problem name, if the problem is accounted for by the module. Moreover, 
 the command obj("ProblemName",inputVector) outputs the value of the objective function for a 
-given test problem and input vector.
+given test problem and input vector. An example of how to use JuliaCUTEstModule in a separate 
+script is included in the file JuliaCUTEstModuleExample.jl.
