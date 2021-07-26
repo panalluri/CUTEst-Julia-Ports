@@ -1,13 +1,13 @@
-module Wrapper
+# module Wrapper
 
-export wrapfun
+# export wrapfun
 
-using CUTEst
-using NLPModels
-using SpecialFunctions
+# using CUTEst
+# using NLPModels
+# using SpecialFunctions
 
 A = Dict{String,Function}()
-B=Dict("LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETCHBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>30,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>1667^2,"HYDCAR6LS"=>29,"SPINLS"=>2602,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
+B=Dict("INTEQNELS"=>502, "OSBORNEB"=>11, "INDEFM"=>100000,"LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETCHBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>30,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>1667^2,"HYDCAR6LS"=>29,"SPINLS"=>2602,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
 
 A["INDEFM"]=function indefm(x::AbstractVector)
     println("Julia port of CUTEST's INDEFM")
@@ -5400,48 +5400,48 @@ z=rand(1:10,10^6)
 z=ones(10^8)
 println(problemVector)
 
-for i =1:length(problemVector)
-    prob=problemVector[i]
-    y=B[prob]
-    println(string(y)*prob)
-    soln=(A[prob](ones(y)))
-    println(soln)
-end
+# for i =1:length(problemVector)
+#     prob=problemVector[i]
+#     y=B[prob]
+#     println(string(y)*prob)
+#     soln=(A[prob](ones(y)))
+#     println(soln)
+# end
 
-function unitTesting(problemVector,sumArray,gradArray,z)
-    sumArraySIF = ones(length(problemVector))
-    gradArraySIF = ones(length(problemVector))
-    for i = 1:length(problemVector)
-        problem = problemVector[i]
-        lens=B[problem]
-        #x=z[1:lens]
-        x=ones(lens)
-        temp=A[problem](x)
-        sumArray[i]=temp
-        println("Working on: "*problem)
-        nlp = CUTEstModel(problem, verbose=false)
-        fx = obj(nlp, x)
-        #gx = grad(nlp, x)
-        finalize(nlp)
-        fx = convert(Float64,fx)
-        #gx = convert(Array{Float64},gx)
-        sumArraySIF[i] = fx
-        #gradArraySIF[i] = gx
-    end
-    for i = 1:length(problemVector)
-        if sumArray[i]-sumArraySIF[i] != 0
-            println("Issue with sum: " * problemVector[i])
-            println(sumArray[i])
-            println(sumArraySIF[i])
-            # println(x)
-        end
-        # if gradArray[i]-gradArraySIF[i] != 0
-        #     println("grad: " * problemVector[i])
-        #     # println(x)
-        # end
-    end
-end
+# function unitTesting(problemVector,sumArray,gradArray,z)
+#     sumArraySIF = ones(length(problemVector))
+#     gradArraySIF = ones(length(problemVector))
+#     for i = 1:length(problemVector)
+#         problem = problemVector[i]
+#         lens=B[problem]
+#         #x=z[1:lens]
+#         x=ones(lens)
+#         temp=A[problem](x)
+#         sumArray[i]=temp
+#         println("Working on: "*problem)
+#         nlp = CUTEstModel(problem, verbose=false)
+#         fx = obj(nlp, x)
+#         #gx = grad(nlp, x)
+#         finalize(nlp)
+#         fx = convert(Float64,fx)
+#         #gx = convert(Array{Float64},gx)
+#         sumArraySIF[i] = fx
+#         #gradArraySIF[i] = gx
+#     end
+#     for i = 1:length(problemVector)
+#         if sumArray[i]-sumArraySIF[i] != 0
+#             println("Issue with sum: " * problemVector[i])
+#             println(sumArray[i])
+#             println(sumArraySIF[i])
+#             # println(x)
+#         end
+#         # if gradArray[i]-gradArraySIF[i] != 0
+#         #     println("grad: " * problemVector[i])
+#         #     # println(x)
+#         # end
+#     end
+# end
 
-unitTesting(problemVector,sumArray,gradArray,z)
+# unitTesting(problemVector,sumArray,gradArray,z)
 
-end
+# end

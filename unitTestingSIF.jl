@@ -2023,15 +2023,28 @@ sumArray = zeros(length(problemVector))
 gradArray=zeros(length(problemVector))
 B = Dict("OSCIGRAD"=>100000,"BOX3"=>3,"OSCIPATH"=>500,"BOX"=>10000,"BOXBODLS"=>2,"BOXPOWER"=>20000,"ENGVAL2"=>3,"ENGVAL1"=>5000,"ROSENBR"=>2,"SROSENBR"=>5000,"ROSENBRTU"=>2,"GENROSE"=>500,"POWER"=>10000,"FLETCHCR"=>1000,"EXTROSNB"=>1000,"ROSZMAN1LS"=>4,"DIXMAANI"=>3000,"LIARWHD"=>5000,"SCHMVETT"=>5000,"LUKSAN13LS"=>98,"JUDGE"=>2,"NONDIA"=>5000,"DIXMAANJ"=>3000,"DIXMAANC"=>3000,"DIXMAANL"=>3000,"DIXMAANK"=>3000,"DIXMAANG"=>3000,"DIXMAANF"=>3000,"DIXMAANE"=>3000,"DIXMAANP"=>3000,"DIXMAANH"=>3000,"DIXMAANB"=>3000,"DIXMAANN"=>3000,"DIXMAANA"=>3000,"DIXMAANO"=>3000,"DIXMAANM"=>3000,"DIXMAAND"=>3000,"SINVALNE"=>2,"COSINE"=>10000,"SSCOSINE"=>5000,"SINEVAL"=>2,"MUONSINELS"=>1,"SCOSINE"=>5000,"SINQUAD"=>5000,"CLIFF"=>2,"EG2"=>1000,"EXP2"=>2,"CUBE"=>2,"GAUSSIAN"=>3,"HUMPS"=>2)
 z=rand(1:10,10^8)
-println(problemVector)
+# println(problemVector)
 
-for i =1:length(problemVector)
-    prob=problemVector[i]
-    y=B[prob]
-    println(string(y)*prob)
-    soln=(A[prob](ones(y)))
-    println(soln)
-end
+# for i =1:length(problemVector)
+#     prob=problemVector[i]
+#     y=B[prob]
+#     println(string(y)*prob)
+#     soln=(A[prob](ones(y)))
+#     println(soln)
+# end
+
+# a = problemVector
+# b = collect(keys(B))
+# for i = 1:length(a)
+#     for j = 1:length(b)
+#         if a[i] == b[j]
+#             a[i] = ""
+#             b[j] = ""
+#         end
+#     end
+# end
+# println(a)
+# println(b)
 
 # function unitTesting(problemVector,sumArray,gradArray,z)
 #     sumArraySIF = ones(length(problemVector))

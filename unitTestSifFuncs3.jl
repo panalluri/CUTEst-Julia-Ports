@@ -4024,16 +4024,29 @@ problemVector = collect(keys(A))
 sumArray = ones(length(problemVector))
 gradArray=zeros(length(problemVector))
 z=rand(1:10,10^8)
-println(problemVector)
-println(length(problemVector))
+# println(problemVector)
+# println(length(problemVector))
 
-for i =1:length(problemVector)
-    prob=problemVector[i]
-    y=B[prob]
-    println(string(y)*prob)
-    soln=(A[prob](ones(y)))
-    println(soln)
+# for i =1:length(problemVector)
+#     prob=problemVector[i]
+#     y=B[prob]
+#     println(string(y)*prob)
+#     soln=(A[prob](ones(y)))
+#     println(soln)
+# end
+
+a = problemVector
+b = collect(keys(B))
+for i = 1:length(a)
+    for j = 1:length(b)
+        if a[i] == b[j]
+            a[i] = ""
+            b[j] = ""
+        end
+    end
 end
+println(a)
+println(b)
 
 # function unitTesting(problemVector,sumArray,gradArray,z)
 #     sumArraySIF = ones(length(problemVector))

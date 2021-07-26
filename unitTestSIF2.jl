@@ -1,9 +1,9 @@
-module Wrapper
+# module Wrapper
 
-export wrapfun
+# export wrapfun
 
-using CUTEst
-using NLPModels
+# using CUTEst
+# using NLPModels
 
 A = Dict{String,Function}()
 
@@ -1595,50 +1595,50 @@ sumArray = ones(length(problemVector))
 gradArray=zeros(length(problemVector))
 B = Dict("LOGHAIRY"=>2,"QUARTC"=>5000,"TQUARTIC"=>5000,"NONDQUAR"=>5000,"QING"=>100,"SSI"=>3,"KSSLS"=>1000,"POWELLSG"=>5000,"POWELLBSLS"=>2,"POWELLSQLS"=>2,"WAYSEA2"=>2,"WAYSEA1"=>2,"PENALTY1"=>1000,"DQRTIC"=>5000,"BDQRTIC"=>5000,"DQDRTIC"=>5000,"WOODS"=>4000,"DANWOODLS"=>2,"DANIWOODLS"=>2,"ARGTRIGLS"=>200,"CURLY10"=>10000,"CURLY20"=>10000,"CURLY30"=>10000,"SCURLY30"=>10000,"SCURLY20"=>10000,"SCURLY10"=>10000,"BROWNAL"=>200,"BROWNBS"=>2,"BROWNDEN"=>4,"HELIX"=>3,"MEXHAT"=>2,"POWERSUM"=>4,"SPARSQUR"=>10000,"ELATVIDU"=>2,"LANCZOS3LS"=>6,"TRIGON2"=>10,"DENSCHNE"=>3,"MISRA1CLS"=>2,"PALMER4C"=>8,"CRAGGLVY"=>5000,"PALMER3C"=>8,"LANCZOS1LS"=>6,"CHNROSNB"=>50,"EDENSCH"=>2000,"RECIPELS"=>3,"EGGCRATE"=>2,"CHWIRUT1LS"=>3,"MGH10LS"=>3,"HATFLDGLS"=>25,"BARD"=>3,"ERRINROS"=>50,"HATFLDFLS"=>3,"MOREBV"=>5000,"ARGLINB"=>200,"HATFLDFL"=>3,"DEVGLA1"=>4)
 z=rand(1:10,10^6)
-println(problemVector)
+# println(problemVector)
 
-for i =1:length(problemVector)
-    prob=problemVector[i]
-    y=B[prob]
-    println(string(y)*prob)
-    soln=(A[prob](ones(y)))
-    println(soln)
-end
+# for i =1:length(problemVector)
+#     prob=problemVector[i]
+#     y=B[prob]
+#     println(string(y)*prob)
+#     soln=(A[prob](ones(y)))
+#     println(soln)
+# end
 
-function unitTesting(problemVector,sumArray,gradArray,z)
-    sumArraySIF = ones(length(problemVector))
-    gradArraySIF = ones(length(problemVector))
-    for i = 1:length(problemVector)
-        problem = problemVector[i]
-        lens=B[problem]
-        x=z[1:lens]
-        #x=ones(lens)
-        temp=A[problem](x)
-        sumArray[i]=temp
-        println("Working on: "*problem)
-        nlp = CUTEstModel(problem, verbose=false)
-        fx = obj(nlp, x)
-        #gx = grad(nlp, x)
-        finalize(nlp)
-        fx = convert(Float64,fx)
-        #gx = convert(Array{Float64},gx)
-        sumArraySIF[i] = fx
-        #gradArraySIF[i] = gx
-    end
-    for i = 1:length(problemVector)
-        if sumArray[i]-sumArraySIF[i] != 0
-            println("Issue with sum: " * problemVector[i])
-            println(sumArray[i])
-            println(sumArraySIF[i])
-            # println(x)
-        end
-        # if gradArray[i]-gradArraySIF[i] != 0
-        #     println("grad: " * problemVector[i])
-        #     # println(x)
-        # end
-    end
-end
+# function unitTesting(problemVector,sumArray,gradArray,z)
+#     sumArraySIF = ones(length(problemVector))
+#     gradArraySIF = ones(length(problemVector))
+#     for i = 1:length(problemVector)
+#         problem = problemVector[i]
+#         lens=B[problem]
+#         x=z[1:lens]
+#         #x=ones(lens)
+#         temp=A[problem](x)
+#         sumArray[i]=temp
+#         println("Working on: "*problem)
+#         nlp = CUTEstModel(problem, verbose=false)
+#         fx = obj(nlp, x)
+#         #gx = grad(nlp, x)
+#         finalize(nlp)
+#         fx = convert(Float64,fx)
+#         #gx = convert(Array{Float64},gx)
+#         sumArraySIF[i] = fx
+#         #gradArraySIF[i] = gx
+#     end
+#     for i = 1:length(problemVector)
+#         if sumArray[i]-sumArraySIF[i] != 0
+#             println("Issue with sum: " * problemVector[i])
+#             println(sumArray[i])
+#             println(sumArraySIF[i])
+#             # println(x)
+#         end
+#         # if gradArray[i]-gradArraySIF[i] != 0
+#         #     println("grad: " * problemVector[i])
+#         #     # println(x)
+#         # end
+#     end
+# end
 
-unitTesting(problemVector,sumArray,gradArray,z)
+# unitTesting(problemVector,sumArray,gradArray,z)
 
-end
+# end
