@@ -1,4 +1,7 @@
 # CUTEst-Julia-Ports
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5142349.svg)](https://doi.org/10.5281/zenodo.5142349)
+
 The CUTEst test set is a repository of optimization problems that require a Fortran compiler to run. 
 The numerical expressions for these problems is stored in .SIF files, which appear to be an uncommon 
 file format upon which that the CUTEst repository relies heavily.
