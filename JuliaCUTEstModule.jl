@@ -19402,7 +19402,7 @@ end
 end
 
 # a=JuliaCUTEstModule.CUTEstModel("PROBLEM")
-# b=JuliaCUTEstModule.obj(a,InputVector) 
+# b=JuliaCUTEstModule.vecLen("PROBLEM")
 
 # problem = "GENROSE"
 # precision=52
