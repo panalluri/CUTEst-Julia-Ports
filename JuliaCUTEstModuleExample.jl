@@ -1,6 +1,6 @@
 xyz=rand(1:10,500)
 x=convert(Array{Float64},xyz)
-precision=52 #integer
+precision=100 #integer
 
 problem = "GENROSE"
 a=JuliaCUTEstModule.CUTEstModel(problem) #check if problem is in module

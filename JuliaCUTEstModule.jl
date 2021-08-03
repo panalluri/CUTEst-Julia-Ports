@@ -1,5 +1,7 @@
 module JuliaCUTEstModule
 
+export CUTEstModel, vecLen, obj
+
 A = Dict{String,Function}()
 
 A["OSCIGRAD"]=function oscigrad(x::AbstractVector)
