@@ -19376,6 +19376,18 @@ function CUTEstModel(prob)
     end
 end
 
+function vecLen(prob)
+    a = haskey(A,prob)
+    b = haskey(B,prob)
+    if a == true && b == true
+        lens=B[prob]
+        println("input vector should be of length "*string(lens))
+        return
+    else
+        println("There is not existing Julia port of this problem.")
+    end
+end
+
 function obj(prob,x)
     lens=B[prob]
     N = length(x)
@@ -19391,3 +19403,20 @@ end
 
 # a=JuliaCUTEstModule.CUTEstModel("PROBLEM")
 # b=JuliaCUTEstModule.obj(a,InputVector) 
+
+# problem = "GENROSE"
+# precision=52
+# xyz=rand(1:10,500)
+# x=convert(Array{Float64},xyz)
+
+# function wrapfun(x,problem,precision)
+#     setprecision(precision)
+#     bx = convert(Array{BigFloat},x)
+#     if JuliaCUTEstModule.CUTEstModel(problem) == problem
+#         f = JuliaCUTEstModule.obj(problem,x)
+#     end
+#     return convert(Float64,f)#,convert(Array{Float64},g)
+# end
+
+# A = wrapfun(x,problem,precision)
+# println(A)
