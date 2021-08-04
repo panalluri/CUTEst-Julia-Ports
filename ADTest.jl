@@ -1,7 +1,6 @@
-using Enzyme
+using Diffractor
 # using CUTEst
 # using NLPModels
-A = Dict{String,Function}()
 
 function genrose(x::AbstractVector)
   println("Julia port of CUTEST's GENROSE")
@@ -21,7 +20,7 @@ function genrose(x::AbstractVector)
   return sum, grad
 end
 
-A["GENROSE"]=function genrose2(x::AbstractVector)
+function genrose2(x::AbstractVector)
     println("Julia port of CUTEST's GENROSE")
     term = (1 - x[1])
     sum = 1 - term^2
@@ -35,45 +34,24 @@ A["GENROSE"]=function genrose2(x::AbstractVector)
 end
 
 B=Dict("GENROSE"=>500)
-problemVector=collect(keys(A))
+problem="GENROSE"
 z=rand(1:10,10^8)
+z=convert(Array{Float64},z)
 
-function unitTesting(problemVector,z)
-    for i = 1:length(A)
-        problem = problemVector[i]
-        lens=B[problem]
-        x=z[1:lens]
-        temp=A[problem](x)
-        sumPort=temp
-        println("Working on: "*problem)
-        # nlp = CUTEstModel(problem, verbose=false)
-        # fx = obj(nlp, x)
-        # gx = grad(nlp, x)
-        # finalize(nlp)
-        # sumCUTEst = convert(Float64,fx)
-        # if sumPort-sumCUTEst != 0
-        #     println("Issue with sum: " * problemVector[i])
-        #     println(sumPort)
-        #     println(sumCUTEst)
-        # end
-        # gradCUTEst = convert(Array{Float64},gx)
-        gradPort = zero(x)
-        Z = autodiff(A[problem],Active,Duplicated(x,gradPort))
-        println(gradPort)
-        # if gradPort-gradCUTEst != 0
-        #     println("Issue with gradient: " * problemVector[i])
-        #     println(gradPort)
-        #     println(gradCUTEst)
-        # end
+function unitTesting(problem,z)
+    lens=B[problem]
+    x=z[1:lens]
+    f,g = genrose(x)
+    println("grad:"*string(g))
+    temp=genrose2(x)
+    sumPort=temp
+    gradPort = Diffractor.PrimeDerivativeBack(genrose2)(x)
+    println(gradPort)
+    for i = 1:length(x)
+      if gradPort[i] != g[i]
+        println("Error in grad element "*string(i)*"! Diffractor: "*string(gradPort[i])*", genrose func: "*string(g[i]))
+      end
     end
 end
 
-unitTesting(problemVector,z)
-
-# x = ones(500)
-# df_dx = zero(x)
-# Z = autodiff(A["GENROSE"],Active,Duplicated(x,df_dx))
-#A,C = genrose(x)
-
-#println(A["GENROSE"](x))
-# println(df_dx-C)
+unitTesting(problem,z)
