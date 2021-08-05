@@ -19391,8 +19391,7 @@ function unitTesting(problemVector,z)
             println(sumCUTEst)
         end
         gradCUTEst = convert(Array{Float64},gx)
-        gradPort = zero(x)
-        Z = autodiff(A[problem],Active,Duplicated(x,gradPort))
+        gradPort = ForwardDiff.gradient(A[problem],x)
         if gradPort-gradCUTEst != 0
             println("Issue with gradient: " * problemVector[i])
             println(gradPort)
