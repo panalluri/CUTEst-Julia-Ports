@@ -19389,12 +19389,16 @@ end
 function grad(prob,x)
     lens=B[prob]
     N = length(x)
-    if lens != N
-        println("input vector should be of length "*string(lens))
-        return
+    if haskey(gIssue,prob) == true
+        if lens != N
+            println("input vector should be of length "*string(lens))
+            return
+        end
+        gx = ForwardDiff.gradient(A[prob],x)
+        return gx
+    else
+        println("Gradient not supported for the specified function")
     end
-    gx = ForwardDiff.gradient(A[prob],x)
-    return gx
 end
 
 end

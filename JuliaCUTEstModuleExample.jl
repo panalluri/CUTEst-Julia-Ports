@@ -1,8 +1,8 @@
-xyz=rand(1:10,500)
+xyz=rand(1:10,10000)
 x=convert(Array{Float64},xyz)
 precision=100 #integer
 
-problem = "GENROSE"
+problem = "POWER"
 a=JuliaCUTEstModule.CUTEstModel(problem) #check if problem is in module
 b=JuliaCUTEstModule.vecLen(problem) #outputs length of input vector for problem
 
