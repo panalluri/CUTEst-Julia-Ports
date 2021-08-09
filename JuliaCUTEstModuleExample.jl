@@ -12,8 +12,9 @@ function wrapfun(x,problem,precision)
     bx = convert(Array{BigFloat},x)
     if JuliaCUTEstModule.CUTEstModel(problem) == problem
         f = JuliaCUTEstModule.obj(problem,x)
+        g = JuliaCUTEstModule.grad(problem,x)
     end
-    return convert(Float64,f)#,convert(Array{Float64},g)
+    return convert(Float64,f),convert(Array{Float64},g)
 end
 
 A = wrapfun(x,problem,precision)
