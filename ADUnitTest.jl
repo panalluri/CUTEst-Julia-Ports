@@ -3361,7 +3361,7 @@ A["MGH10LS"]=function mgh10ls(x::AbstractVector)
     grad = zeros(size(x))
     sum=0
     for i = 1:16
-        term1 = exp(x[2]/(x[3]*X[i]))
+        term1 = exp(x[2]/(x[3]+X[i]))
         sum = sum + (-Y[i] + x[1]*term1)^2
     end
     return sum#, grad
@@ -4169,11 +4169,13 @@ A["MEYER3"]=function meyer3(x::AbstractVector)
     G[14]=3820.0
     G[15]=3307.0
     G[16]=2872.0
-    x[1]=100*x[1]
+    a=100*x[1]
+    b=0.001*x[2]
+    c=0.01*x[3]
     for i = 1:16
         term1 = -G[i]
         coeff=45+5*i
-        term2 = x[1]*exp(0.0001*x[2]/(coeff+0.01*x[3]))
+        term2 = a*exp(b/(coeff+c))
         sum = sum+(term1+term2)^2
     end
     return sum#, grad
@@ -7071,17 +7073,6 @@ A["DENSCHNB"]=function denschnb(x::AbstractVector)
     return sum#, grad
 end
 
-A["DENSCHND"]=function denschnd(x::AbstractVector)
-    #println("Julia port of CUTEST's DENSCHND")
-    grad = zeros(size(x))
-    sum=0
-    term1 = x[1]^2+x[2]^3-x[3]^4
-    term2 = 2*(x[1]*x[2]*x[3])
-    term3 = 2*x[1]*x[2]-3*x[3]*x[2]+x[1]*x[3]
-    sum = sum + term1^2+term2^2+term3^2
-    return sum#, grad
-end
-
 A["LSC2LS"]=function lsc2ls(x::AbstractVector)
     #println("Julia port of CUTEST's LSC2LS")
     grad = zeros(size(x))
@@ -7147,7 +7138,7 @@ A["DENSCHND"]=function denschnd(x::AbstractVector)
     #println("Julia port of CUTEST's DENSCHND")
     grad = zeros(size(x))
     sum=0
-    term1 = x[1]+x[2]^3-x[3]^4
+    term1 = x[1]^2+x[2]^3-x[3]^4
     term2 = 2*(x[1]*x[2]*x[3])
     term3 = 2*x[1]*x[2]-3*x[3]*x[2]+x[1]*x[3]
     sum = sum + term1^2+term2^2+term3^2
@@ -7377,7 +7368,7 @@ A["FREUROTH"]=function freuroth(x::AbstractVector)
     for i = 1:(N-1)
         term1 = x[i]-2*x[i+1]-13
         term2 = (5-1*x[i+1])*x[i+1]^2
-        term3 = x[1]-14*x[i+1]-29
+        term3 = x[i]-14*x[i+1]-29
         term4 = (1+1*x[i+1])*x[i+1]^2
         sum = sum + (term1+term2)^2+(term3+term4)^2
     end
@@ -10472,7 +10463,7 @@ A["VESUVIOLS"]=function vesuviols(x::AbstractVector)
     sum=0
     for i = 1:M
         term1 = x[1]/E[i]
-        term2 = X[i]/E[i]
+        term2 = X[i]/E[i]*x[2]
         term3 = -Y[i]/E[i]
         term4 = (1/E[i])*x[3]*exp(-0.5*((X[i]-x[4])/x[5])^2)
         term5 = (1/E[i])*x[6]*exp(-0.5*((X[i]-x[7])/x[8])^2)
@@ -16853,12 +16844,12 @@ A["MANCINO"]=function mancino(x::AbstractVector)
         end
         term1=term1-coeff
         for j =1:(i-1)
-            VIJ = sqrt(x[i]^2+i/j)
+            VIJ = sqrt(x[j]^2+i/j)
             SUMAL = sin(log(VIJ))^a+cos(log(VIJ))^a
             term1 = term1+VIJ*SUMAL
         end
         for j =(i+1):N
-            VIJ = sqrt(x[i]^2+i/j)
+            VIJ = sqrt(x[j]^2+i/j)
             SUMAL = sin(log(VIJ))^a+cos(log(VIJ))^a
             term1 = term1+VIJ*SUMAL
         end
@@ -17242,7 +17233,7 @@ A["PENALTY2"]=function penalty2(x::AbstractVector)
     grad = zeros(size(x))
     N=200
     A=10^(-5)
-    B=0.1
+    B=1
     M=2*N
     term1 = x[1]-0.2
     sum=B*term1^2
@@ -19396,14 +19387,9 @@ end
 # "LUKSAN16LS", "SPMSRTLS", "FMINSURF", "VIBRBEAM", "EIGENBLS",
 # "DJTL", "LUKSAN17LS", "EIGENCLS", "SPINLS"
 
-# gradient errors: "PALMER7C", "MOREBV", 
-# "CERI651BLS", "DIXMAANO", "BROYDN7D", "SSCOSINE", "CERI651CLS", 
-# "CHNRSNBM", "PALMER6C", "TRIGON2", "CERI651ALS", "PALMER4C", 
-# "VESUVIOLS", "WATSON", "PENALTY2", "CERI651DLS", "ERRINRSM", 
-# "PALMER1D", "DIXMAANP", "SSBRYBND" "PALMER3C", "MANCINO",
-# "SCURLY30", "DENSCHND", "CERI651ELS", "SCURLY20", "MEYER3", 
-# "BROWNDEN", "PALMER8C", "FREUROTH", "SBRYBND", "MGH10LS", 
-# "DEVGLA2", "SCURLY10", "PALMER2C", "HATFLDFLS", "LUKSAN13LS"
+# gradient errors: "MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS"
+
+gIssue=["MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS", "MSQRTBLS", "NONMSQRT", "YATP2LS", "LUKSAN15LS", "YATP2CLS", "EIGENALS", "YATP1LS", "LUKSAN11LS", "YATP1CLS", "LUKSAN16LS", "SPMSRTLS", "FMINSURF", "VIBRBEAM", "EIGENBLS", "DJTL", "LUKSAN17LS", "EIGENCLS", "SPINLS"]
 
 #unitTesting(problemVector,z)
 println(problemVector)
