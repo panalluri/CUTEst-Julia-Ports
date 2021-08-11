@@ -1,138 +1,159 @@
 using ForwardDiff
 using SpecialFunctions
+using CUTEst
+using NLPModels
 
 A = Dict{String,Function}()
 
 A["LUKSAN15LS"]=function luksan15ls(x::AbstractVector)
-  #println("Julia port of CUTEST's LUKSAN15LS")
-  grad = zeros(size(x))
-  S=49
-  M=S*4
-  sum=0
-  Y=zeros(eltype(x),4)
-  Y[1]=35.8
-  Y[2]=11.2
-  Y[3]=6.2
-  Y[4]=4.4
-  E=zeros(eltype(x),M)
-  k=1
-  for j=1:S
-      E[k]=-Y[1]
-      k=k+1
-  end
-  F=zeros(eltype(x),M,M)
-  for p=1:3
-      k=1
-      i=0
-      for j = 1:S
-          for l=1:4
-              PLI=1/(p*l)
-              P2OL = p^2/l
-              P=x[i+1]*(x[i+2]^2)*x[i+3]^3*x[i+4]^4
-              if P>0
-                  P=P
-              else
-                  P=-P
-              end
-              F[k,p]=P
-              k=k+1
-          end
-          i=i+2
-      end
-  end
-  for g=1:M
-      E[g]=E[g]+F[g,1]
-      sum=sum+E[g]^2
-  end
-  return sum #, grad
+    #println("Julia port of CUTEST's LUKSAN15LS")
+    grad = zeros(size(x))
+    S=49
+    N=2*S+2
+    M=S*4
+    sum=0
+    Y=zeros(eltype(x),4)
+    Y[1]=35.8
+    Y[2]=11.2
+    Y[3]=6.2
+    Y[4]=4.4
+    E=zeros(eltype(x),M)
+    k=1
+    for j=1:S
+        E[k]=-Y[1]
+        k=k+1
+        E[k]=-Y[2]
+        k=k+1
+        E[k]=-Y[3]
+        k=k+1
+        E[k]=-Y[4]
+        k=k+1
+    end
+    F=zeros(eltype(x),M,M)
+    for p=1:3
+        k=1
+        i=0
+        for j = 1:S
+            for l=1:4
+                PLI=1/(p*l)
+                P2OL = p^2/l
+                P=x[i+1]*(x[i+2]^2)*x[i+3]^3*x[i+4]^4
+                if P>0
+                    P=P
+                else
+                    P=-P
+                end
+                F[k,p]=P2OL*P^PLI
+                k=k+1
+            end
+            i=i+2
+        end
+    end
+    for g=1:M
+        E[g]=E[g]+F[g,1]+F[g,2]+F[g,3]
+        sum=sum+E[g]^2
+    end
+    return sum #, grad
 end
 
 A["LUKSAN17LS"]=function luksan17ls(x::AbstractVector)
-  #println("Julia port of CUTEST's LUKSAN17LS")
-  grad = zeros(size(x))
-  S=49
-  M=S*4
-  sum=0
-  Y=zeros(eltype(x),4)
-  Y[1]=30.6
-  Y[2]=72.2
-  Y[3]=124.4
-  Y[4]=187.4
-  E=zeros(eltype(x),M)
-  k=1
-  for j=1:S
-      E[k]=-Y[1]
-      k=k+1
-  end
-  C=zeros(eltype(x),M,M)
-  Si=zeros(eltype(x),M,M)
-  for q=1:4
-      k=1
-      i=0
-      for j=1:S
-          for l=1:4
-              A=-l*q^2
-              Si[k,q]=Si[k,q]+A*sin(x[i+q])
-          end
-          i=i+2
-      end
-  end
-  for g=1:M
-      for q=1:4
-      E[g]=E[g]+Si[g,q]
-      end
-      sum=sum+E[g]^2
-  end
-  return sum #, grad
+    #println("Julia port of CUTEST's LUKSAN17LS")
+    grad = zeros(size(x))
+    S=49
+    N=2*S+2
+    M=S*4
+    sum=0
+    Y=zeros(eltype(x),4)
+    Y[1]=30.6
+    Y[2]=72.2
+    Y[3]=124.4
+    Y[4]=187.4
+    E=zeros(eltype(x),M)
+    k=1
+    for j=1:S
+        E[k]=-Y[1]
+        k=k+1
+        E[k]=-Y[2]
+        k=k+1
+        E[k]=-Y[3]
+        k=k+1
+        E[k]=-Y[4]
+        k=k+1
+    end
+    C=zeros(eltype(x),M,M)
+    Si=zeros(eltype(x),M,M)
+    for q=1:4
+        k=1
+        i=0
+        for j=1:S
+            for l=1:4
+                A=-l*q^2
+                Si[k,q]=Si[k,q]+A*sin(x[i+q])
+                A=l^2*q
+                C[k,q]=C[k,q]+A*cos(x[i+q])
+                k=k+1
+            end
+            i=i+2
+        end
+    end
+    for g=1:M
+        for q=1:4
+        E[g]=E[g]+Si[g,q]+C[g,q]
+        end
+        sum=sum+E[g]^2
+    end
+    return sum #, grad
 end
 
 A["EIGENBLS"]=function eigenbls(x::AbstractVector)
-  #println("Julia port of CUTEST's EIGENBLS")
-  grad = zeros(size(x))
-  N=50
-  sum=0
-  a=x
-  d=zeros(eltype(x),N)
-  q=zeros(eltype(x),N,N)
-  k=1
-  for j =1:N
-      d[j] = a[k]
-      k=k+1
-      for i = 1:N
-          q[i,j]=a[k]
-          k=k+1
-      end
-  end
-  #CONSTZ
-  A=zeros(eltype(x),N,N)
-  E=zeros(eltype(x),N,N)
-  O=zeros(eltype(x),N,N)
-  for j = 2:N
-      for i=1:(j-2)
-          A[i,j]=0
-      end
-      A[j-1,j]=-1
-  end
-  for j = 1:N
-      O[j,j]=-1
-      for i=1:j
-          E[i,j]=-A[i,j]
-      end
-  end
-  for j = 1:N
-      for i=1:j
-          for k=1:N
-              E[i,j]=E[i,j]+q[k,i]*d[k]
-              O[i,j]=O[i,j]+q[k,i]*q[k,j]
-          end
-      end
-  end
-  for j = 1:N
-      for i=1:N
-          sum=sum+E[i,j]^2+O[i,j]^2
-      end
-  end
-  return sum #, grad
+    #println("Julia port of CUTEST's EIGENBLS")
+    grad = zeros(size(x))
+    N=50
+    sum=0
+    a=x
+    d=zeros(eltype(x),N)
+    q=zeros(eltype(x),N,N)
+    k=1
+    for j =1:N
+        d[j] = a[k]
+        k=k+1
+        for i = 1:N
+            q[i,j]=a[k]
+            k=k+1
+        end
+    end
+    #CONSTZ
+    A=zeros(eltype(x),N,N)
+    A[1,1]=2
+    E=zeros(eltype(x),N,N)
+    O=zeros(eltype(x),N,N)
+    for j = 2:N
+        for i=1:(j-2)
+            A[i,j]=0
+        end
+        A[j-1,j]=-1
+        A[j,j]=2
+    end
+    for j = 1:N
+        O[j,j]=-1
+        for i=1:j
+            E[i,j]=-A[i,j]
+        end
+    end
+    for j = 1:N
+        for i=1:j
+            for k=1:N
+                E[i,j]=E[i,j]+q[k,i]*q[k,j]*d[k]
+                O[i,j]=O[i,j]+q[k,i]*q[k,j]
+            end
+        end
+    end
+    for j = 1:N
+        for i=1:N
+            sum=sum+E[i,j]^2+O[i,j]^2
+        end
+    end
+    return sum #, grad
 end
 
 A["NONMSQRT"]=function nonmsqrt(x::AbstractVector)
@@ -930,6 +951,9 @@ function luksan13ls(x::AbstractVector)
     return sum#, grad
 end
 
+#ISSUES: meyer3, morebv, luksan13ls, sscosine, yatp1cls,
+#yatp1ls, yatp2cls, yatp2ls
+
 B = Dict("OSCIGRAD"=>100000,"BOX3"=>3,"OSCIPATH"=>500,"BOX"=>10000,"BOXBODLS"=>2,"BOXPOWER"=>20000,"ENGVAL2"=>3,"ENGVAL1"=>5000,"ROSENBR"=>2,"SROSENBR"=>5000,"ROSENBRTU"=>2,"GENROSE"=>500,"POWER"=>10000,"FLETCHCR"=>1000,"EXTROSNB"=>1000,"ROSZMAN1LS"=>4,"DIXMAANI"=>3000,"LIARWHD"=>5000,"SCHMVETT"=>5000,"LUKSAN13LS"=>98,"JUDGE"=>2,"NONDIA"=>5000,"DIXMAANJ"=>3000,"DIXMAANC"=>3000,"DIXMAANL"=>3000,"DIXMAANK"=>3000,"DIXMAANG"=>3000,"DIXMAANF"=>3000,"DIXMAANE"=>3000,"DIXMAANP"=>3000,"DIXMAANH"=>3000,"DIXMAANB"=>3000,"DIXMAANN"=>3000,"DIXMAANA"=>3000,"DIXMAANO"=>3000,"DIXMAANM"=>3000,"DIXMAAND"=>3000,"SINVALNE"=>2,"COSINE"=>10000,"SSCOSINE"=>5000,"SINEVAL"=>2,"MUONSINELS"=>1,"SCOSINE"=>5000,"SINQUAD"=>5000,"CLIFF"=>2,"EG2"=>1000,"EXP2"=>2,"CUBE"=>2,"GAUSSIAN"=>3,"HUMPS"=>2)
 C = Dict("LOGHAIRY"=>2,"QUARTC"=>5000,"TQUARTIC"=>5000,"NONDQUAR"=>5000,"QING"=>100,"SSI"=>3,"KSSLS"=>1000,"POWELLSG"=>5000,"POWELLBSLS"=>2,"POWELLSQLS"=>2,"WAYSEA2"=>2,"WAYSEA1"=>2,"PENALTY1"=>1000,"DQRTIC"=>5000,"BDQRTIC"=>5000,"DQDRTIC"=>5000,"WOODS"=>4000,"DANWOODLS"=>2,"DANIWOODLS"=>2,"ARGTRIGLS"=>200,"CURLY10"=>10000,"CURLY20"=>10000,"CURLY30"=>10000,"SCURLY30"=>10000,"SCURLY20"=>10000,"SCURLY10"=>10000,"BROWNAL"=>200,"BROWNBS"=>2,"BROWNDEN"=>4,"HELIX"=>3,"MEXHAT"=>2,"POWERSUM"=>4,"SPARSQUR"=>10000,"ELATVIDU"=>2,"LANCZOS3LS"=>6,"TRIGON2"=>10,"DENSCHNE"=>3,"MISRA1CLS"=>2,"PALMER4C"=>8,"CRAGGLVY"=>5000,"PALMER3C"=>8,"LANCZOS1LS"=>6,"CHNROSNB"=>50,"EDENSCH"=>2000,"RECIPELS"=>3,"EGGCRATE"=>2,"CHWIRUT1LS"=>3,"MGH10LS"=>3,"HATFLDGLS"=>25,"BARD"=>3,"ERRINROS"=>50,"HATFLDFLS"=>3,"MOREBV"=>5000,"ARGLINB"=>200,"HATFLDFL"=>3,"DEVGLA1"=>4)
 B = merge!(B,C)
@@ -943,16 +967,38 @@ B=merge!(B,G)
 problemVector = collect(keys(A))
 xyz=rand(1:10,10^8)
 z=convert(Array{Float64},xyz)
+println(problemVector)
 
 function unitTesting(problemVector,z)
     for i = 1:length(A)
         problem = problemVector[i]
         lens=B[problem]
         x=z[1:lens]
-        Z = ForwardDiff.gradient(A[problem],x)
-        println(Z)
-        if i == 2
-            break
+        temp=A[problem](x)
+        sumPort=temp
+        println("Working on: "*problem)
+        nlp = CUTEstModel(problem, verbose=false)
+        fx = obj(nlp, x)
+        gx = grad(nlp, x)
+        finalize(nlp)
+        sumCUTEst = convert(Float64,fx)
+        if sumPort-sumCUTEst != 0
+            println("Issue with sum: " * problemVector[i])
+            println(sumPort)
+            println(sumCUTEst)
+        end
+        gradCUTEst = convert(Array{Float64},gx)
+        gradPort = ForwardDiff.gradient(A[problem],x)
+        gErr=0
+        for j = 1:lens
+            if abs(gradPort[j]-gradCUTEst[j]) >= 10^(-4)
+                gErr = 1
+            end
+        end
+        if gErr == 1
+            println("Issue with gradient: " * problemVector[i])
+            #println(gradPort)
+            #println(gradCUTEst)
         end
     end
 end
