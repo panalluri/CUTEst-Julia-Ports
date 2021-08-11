@@ -316,18 +316,24 @@ A["LUKSAN13LS"]=function luksan13ls(x::AbstractVector)
     #println("Julia port of CUTEST's LUKSAN13LS")
     grad = zeros(size(x))
     sum = 0
-    S = convert(Int64,(length(x)-2)/3)
+    S = 32
+    N=3*S+2
+    E=zeros(eltype(x),N^2)
     i=1
+    k=1
     for j = 1:S
-      term = -10*x[i+1]+10*x[i]^2
-      term1 = -10*x[i+2]+10*x[i+1]^2
-      term2 = (x[i+2]-x[i+3])^2
-      term3 = (x[i+3]-x[i+4])^2
-      term4 = x[i]+x[i+2]-30+x[i]^2
-      term5 = x[i+1]+x[i+3]-10-x[i+2]^2
-      term6 = -10+x[i]*x[i+4]
-      sum = sum +term^2+ term1^2+term2^2+term3^2+term4^2+term5^2+term6^2
+      E[k] = -10*x[i+1]+10*x[i]^2
+      E[k+1] = -10*x[i+2]+10*x[i+1]^2
+      E[k+2] = (x[i+2]-x[i+3])^2
+      E[k+3] = (x[i+3]-x[i+4])^2
+      E[k+4] = x[i]+x[i+2]-30+x[i]^2
+      E[k+5] = x[i+1]+x[i+3]-10-x[i+2]^2
+      E[k+6] = -10+x[i]*x[i+4]
       i=i+3
+      k=k+7
+    end
+    for i=1:length(E)
+        sum=sum+E[i]^2
     end
     return sum#, grad
 end
@@ -16135,12 +16141,12 @@ A["YATP1LS"]=function yatp1ls(x::AbstractVector)
     A=10
     sum=0
     a=x
-    x=zeros(N,N)
+    x=zeros(eltype(x),N,N)
     for i = 1:N
         x[i,1:N] = a[1+(i-1)*N:N*i]
     end
-    y=zeros(N)
-    z=zeros(N)
+    y=zeros(eltype(x),N)
+    z=zeros(eltype(x),N)
     y=a[(N*N+1):2:length(a)]
     z=a[(N*N+2):2:length(a)]
     for i = 1:N
@@ -16164,12 +16170,12 @@ A["YATP2CLS"]=function yatp2cls(x::AbstractVector)
     A=1
     sum=0
     a=x
-    x=zeros(N,N)
+    x=zeros(eltype(x),N,N)
     for i = 1:N
         x[i,1:N] = a[1+(i-1)*N:N*i]
     end
-    y=zeros(N)
-    z=zeros(N)
+    y=zeros(eltype(x),N)
+    z=zeros(eltype(x),N)
     y=a[(N*N+1):2:length(a)]
     z=a[(N*N+2):2:length(a)]
     for i = 1:N
@@ -16177,7 +16183,7 @@ A["YATP2CLS"]=function yatp2cls(x::AbstractVector)
         term2 = -1
         term3=0
         for j = 1:N
-            term3 = x[i,j]-y[i]-z[j]-A-(y[i]+z[i])*cos(x[i,j])
+            term3 = x[i,j]-y[i]-z[j]-A-(y[i]+z[j])*cos(x[i,j])
             term1=term1+x[i,j]
             term2=term2+x[i,j]
             term1 = term1+sin(x[i,j])
@@ -16196,12 +16202,12 @@ A["YATP2LS"]=function yatp2ls(x::AbstractVector)
     A=1
     sum=0
     a=x
-    x=zeros(N,N)
+    x=zeros(eltype(x),N,N)
     for i = 1:N
         x[i,1:N] = a[1+(i-1)*N:N*i]
     end
-    y=zeros(N)
-    z=zeros(N)
+    y=zeros(eltype(x),N)
+    z=zeros(eltype(x),N)
     y=a[(N*N+1):2:length(a)]
     z=a[(N*N+2):2:length(a)]
     for i = 1:N
@@ -16228,19 +16234,19 @@ A["YATP1CLS"]=function yatp1cls(x::AbstractVector)
     A=10
     sum=0
     a=x
-    x=zeros(N,N)
+    x=zeros(eltype(x),N,N)
     for i = 1:N
         x[i,1:N] = a[1+(i-1)*N:N*i]
     end
-    y=zeros(N)
-    z=zeros(N)
+    y=zeros(eltype(x),N)
+    z=zeros(eltype(x),N)
     y=a[(N*N+1):2:length(a)]
     z=a[(N*N+2):2:length(a)]
     for i = 1:N
         term1 = -1
         term2 = -1
         for j = 1:N
-            term3 = x[i,j]^3-A*x[i,j]^2-x[i,j]*(y[i]+z[i])*cos(x[i,j])+sin(x[i,j])*(y[i]+z[i])
+            term3 = x[i,j]^3-A*x[i,j]^2-x[i,j]*(y[i]+z[j])*cos(x[i,j])+sin(x[i,j])*(y[i]+z[j])
             term1 = term1+sin(x[i,j])/x[i,j]
             term2 = term2+sin(x[i,j])/x[i,j]
             sum = sum + term3^2
@@ -16792,11 +16798,11 @@ A["NONMSQRT"]=function nonmsqrt(x::AbstractVector)
     K=0
     sum=0
     a=x
-    x=zeros(P,P)
+    x=zeros(eltype(x),P,P)
     for i = 1:P
         x[i,1:P] = a[1+(i-1)*P:P*i]
     end
-    B=zeros(P,P)
+    B=zeros(eltype(x),P,P)
     k=0
     for i=1:P
         for j=1:P
@@ -16805,7 +16811,7 @@ A["NONMSQRT"]=function nonmsqrt(x::AbstractVector)
         end
     end
     B[3,1]=0
-    A=zeros(P,P)
+    A=zeros(eltype(x),P,P)
     for i =1:P
         for j=1:P
             for t =1:P
@@ -17203,7 +17209,7 @@ A["FMINSURF"]=function fminsurf(x::AbstractVector)
     SLOPEI=8
     MID=P/2
     a=x
-    x=zeros(P,P)
+    x=zeros(eltype(x),P,P)
     for i = 1:P
         x[i,1:P] = a[1+(i-1)*P:P*i]
     end
@@ -17499,7 +17505,7 @@ A["SPINLS"]=function spinls(x::AbstractVector)
     MU=a[1]
     OMEGA=a[2]
     N=50
-    v=zeros(N,N)
+    v=zeros(eltype(x),N,N)
     b=a[3:length(a)]
     x=b[1:2:2*N]
     y=b[2:2:2*N]
@@ -17549,7 +17555,7 @@ A["SPMSRTLS"]=function spmsrtls(x::AbstractVector)
     M=1667
     sum=0
     a=x
-    x=zeros(M,M)
+    x=zeros(eltype(x),M,M)
     x[1,1]=a[1]
     x[1,2]=a[2]
     k=3
@@ -17565,7 +17571,7 @@ A["SPMSRTLS"]=function spmsrtls(x::AbstractVector)
     k=k+1
     x[M,M]=a[k]
     #CONSTZ
-    B =zeros(M,M)
+    B =zeros(eltype(x),M,M)
     B[1,1]=sin(1)
     B[1,2]=sin(4)
     k=2
@@ -17581,7 +17587,7 @@ A["SPMSRTLS"]=function spmsrtls(x::AbstractVector)
     B[M,M-1]=sin(k^2)
     k=k+1
     B[M,M]=sin(k^2)
-    E=zeros(M,M)
+    E=zeros(eltype(x),M,M)
     #GROUPS
     E[1,1]=-(B[1,1]^2+B[1,2]*B[2,1])
     for i =2:(M-1)
@@ -18024,14 +18030,14 @@ A["MSQRTBLS"]=function msqrtbls(x::AbstractVector)
     N=P^2
     sum=0
     a=x
-    x=zeros(P,P)
+    x=zeros(eltype(x),P,P)
     for i =1:P
         x[i,1:P]=a[1+(i-1)*P:i*P]
     end
     #CONSTZ
-    B =zeros(P,P)
-    A=zeros(P,P)
-    G=zeros(P,P)
+    B =zeros(eltype(x),P,P)
+    A=zeros(eltype(x),P,P)
+    G=zeros(eltype(x),P,P)
     k=0
     for i =1:P
         for j = 1:P
@@ -18069,8 +18075,8 @@ A["EIGENBLS"]=function eigenbls(x::AbstractVector)
     N=50
     sum=0
     a=x
-    d=zeros(N)
-    q=zeros(N,N)
+    d=zeros(eltype(x),N)
+    q=zeros(eltype(x),N,N)
     k=1
     for j =1:N
         d[j] = a[k]
@@ -18081,10 +18087,10 @@ A["EIGENBLS"]=function eigenbls(x::AbstractVector)
         end
     end
     #CONSTZ
-    A=zeros(N,N)
+    A=zeros(eltype(x),N,N)
     A[1,1]=2
-    E=zeros(N,N)
-    O=zeros(N,N)
+    E=zeros(eltype(x),N,N)
+    O=zeros(eltype(x),N,N)
     for j = 2:N
         for i=1:(j-2)
             A[i,j]=0
@@ -18120,8 +18126,8 @@ A["EIGENALS"]=function eigenals(x::AbstractVector)
     N=50
     sum=0
     a=x
-    d=zeros(N)
-    q=zeros(N,N)
+    d=zeros(eltype(x),N)
+    q=zeros(eltype(x),N,N)
     k=1
     for j =1:N
         d[j] = a[k]
@@ -18131,9 +18137,9 @@ A["EIGENALS"]=function eigenals(x::AbstractVector)
             k=k+1
         end
     end
-    A=zeros(N,N)
-    E=zeros(N,N)
-    O=zeros(N,N)
+    A=zeros(eltype(x),N,N)
+    E=zeros(eltype(x),N,N)
+    O=zeros(eltype(x),N,N)
     for j = 1:N
         A[j,j]=j
         for i=1:(j-1)
@@ -18623,7 +18629,7 @@ A["VIBRBEAM"]=function vibrbeam(x::AbstractVector)
     grad = zeros(size(x))
     m=30
     sum=0
-    c=zeros(4)
+    c=zeros(eltype(x),4)
     c[1]=x[1]
     c[2]=x[2]
     c[3]=x[3]
@@ -18632,9 +18638,9 @@ A["VIBRBEAM"]=function vibrbeam(x::AbstractVector)
     d1=x[6]
     d2=x[7]
     d3=x[8]
-    x=zeros(m)
-    v=zeros(m)
-    p=zeros(m)
+    x=zeros(eltype(x),m)
+    v=zeros(eltype(x),m)
+    p=zeros(eltype(x),m)
     x[1]=39.1722
     x[2]=53.9707
     x[3]=47.9829
@@ -18946,17 +18952,17 @@ end
 
 A["EIGENCLS"]=function eigencls(x::AbstractVector)
     #println("Julia port of CUTEST's EIGENCLS")
-    grad = zeros(size(x))
+    grad = zeros(eltype(x),size(x))
     M=25
     N=2*M+1
     sum=0
-    A=zeros(N,N)
-    E=zeros(N,N)
-    O=zeros(N,N)
+    A=zeros(eltype(x),N,N)
+    E=zeros(eltype(x),N,N)
+    O=zeros(eltype(x),N,N)
     A[1,1]=M
     a=x
-    d=zeros(N)
-    q=zeros(N,N)
+    d=zeros(eltype(x),N)
+    q=zeros(eltype(x),N,N)
     k=1
     for j =1:N
         d[j] = a[k]
@@ -18998,11 +19004,11 @@ end
 A["DJTL"]=function djtl(x::AbstractVector)
     #println("Julia port of CUTEST's DJTL")
     grad = zeros(size(x))
-    A=zeros(9)
-    LL=ones(4)
-    SL=ones(4)
-    LU=ones(4)
-    SU=ones(4)
+    A=zeros(eltype(x),9)
+    LL=ones(eltype(x),4)
+    SL=ones(eltype(x),4)
+    LU=ones(eltype(x),4)
+    SU=ones(eltype(x),4)
     E1=(x[1]-10)^3
     E2=(x[2]-20)^3
     E3=(x[1]-5)^2
@@ -19141,12 +19147,12 @@ A["LUKSAN15LS"]=function luksan15ls(x::AbstractVector)
     N=2*S+2
     M=S*4
     sum=0
-    Y=zeros(4)
+    Y=zeros(eltype(x),4)
     Y[1]=35.8
     Y[2]=11.2
     Y[3]=6.2
     Y[4]=4.4
-    E=zeros(M)
+    E=zeros(eltype(x),M)
     k=1
     for j=1:S
         E[k]=-Y[1]
@@ -19158,7 +19164,7 @@ A["LUKSAN15LS"]=function luksan15ls(x::AbstractVector)
         E[k]=-Y[4]
         k=k+1
     end
-    F=zeros(M,M)
+    F=zeros(eltype(x),M,M)
     for p=1:3
         k=1
         i=0
@@ -19192,12 +19198,12 @@ A["LUKSAN17LS"]=function luksan17ls(x::AbstractVector)
     N=2*S+2
     M=S*4
     sum=0
-    Y=zeros(4)
+    Y=zeros(eltype(x),4)
     Y[1]=30.6
     Y[2]=72.2
     Y[3]=124.4
     Y[4]=187.4
-    E=zeros(M)
+    E=zeros(eltype(x),M)
     k=1
     for j=1:S
         E[k]=-Y[1]
@@ -19209,8 +19215,8 @@ A["LUKSAN17LS"]=function luksan17ls(x::AbstractVector)
         E[k]=-Y[4]
         k=k+1
     end
-    C=zeros(M,M)
-    Si=zeros(M,M)
+    C=zeros(eltype(x),M,M)
+    Si=zeros(eltype(x),M,M)
     for q=1:4
         k=1
         i=0
@@ -19241,7 +19247,7 @@ A["LUKSAN11LS"]=function luksan11ls(x::AbstractVector)
     N=S+1
     M=S*2
     sum=0
-    E=zeros(M)
+    E=zeros(eltype(x),M)
     k=1
     for i=1:S
         E[k]=-10*x[i+1]
@@ -19270,12 +19276,12 @@ A["LUKSAN16LS"]=function luksan16ls(x::AbstractVector)
     N=2*S+2
     M=S*4
     sum=0
-    Y=zeros(4)
+    Y=zeros(eltype(x),4)
     Y[1]=35.8
     Y[2]=11.2
     Y[3]=6.2
     Y[4]=4.4
-    E=zeros(M)
+    E=zeros(eltype(x),M)
     k=1
     for j=1:S
         E[k]=-Y[1]
@@ -19287,7 +19293,7 @@ A["LUKSAN16LS"]=function luksan16ls(x::AbstractVector)
         E[k]=-Y[4]
         k=k+1
     end
-    C=zeros(M,M)
+    C=zeros(eltype(x),M,M)
     for q=1:4
         k=1
         i=0
@@ -19348,6 +19354,8 @@ B=merge!(B,F)
 G=Dict("LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETCHBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>8,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>4999,"HYDCAR6LS"=>29,"SPINLS"=>1327,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
 B=merge!(B,G)
 
+gIssue=["MOREBV"=>"no", "SSCOSINE"=>"no", "MEYER3"=>"no", "LUKSAN13LS"=>"no", "YATP2LS"=>"no", "YATP2CLS"=>"no", "YATP1LS"=>"no", "YATP1CLS"=>"no"]
+
 function unitTesting(problemVector,gIssue,z)
     for i = 1:length(A)
         problem = problemVector[i]
@@ -19356,7 +19364,7 @@ function unitTesting(problemVector,gIssue,z)
             x=z[1:lens]
             println("Julia port obj: "*problem)
             sumPort = @btime A[problem](x)
-            println("Julia port obj: "*problem)
+            println("Julia port grad: "*problem)
             gradPort = @btime ForwardDiff.gradient(A[problem],x)
             nlp = CUTEstModel(problem, verbose=false)
             println("CUTEst obj: "*problem)
@@ -19367,14 +19375,5 @@ function unitTesting(problemVector,gIssue,z)
         end
     end
 end
-
-#gradient failures: "MSQRTBLS", "NONMSQRT", "YATP2LS", "LUKSAN15LS",
-# "YATP2CLS", "EIGENALS", "YATP1LS", "LUKSAN11LS", "YATP1CLS",
-# "LUKSAN16LS", "SPMSRTLS", "FMINSURF", "VIBRBEAM", "EIGENBLS",
-# "DJTL", "LUKSAN17LS", "EIGENCLS", "SPINLS"
-
-# gradient errors: "MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS"
-
-# gIssue=["MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS", "MSQRTBLS", "NONMSQRT", "YATP2LS", "LUKSAN15LS", "YATP2CLS", "EIGENALS", "YATP1LS", "LUKSAN11LS", "YATP1CLS", "LUKSAN16LS", "SPMSRTLS", "FMINSURF", "VIBRBEAM", "EIGENBLS", "DJTL", "LUKSAN17LS", "EIGENCLS", "SPINLS"]
 
 unitTesting(problemVector,gIssue,z)

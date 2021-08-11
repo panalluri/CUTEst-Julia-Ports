@@ -292,7 +292,7 @@ A["YATP2CLS"]=function yatp2cls(x::AbstractVector)
         term2 = -1
         term3=0
         for j = 1:N
-            term3 = x[i,j]-y[i]-z[j]-A-(y[i]+z[i])*cos(x[i,j])
+            term3 = x[i,j]-y[i]-z[j]-A-(y[i]+z[j])*cos(x[i,j])
             term1=term1+x[i,j]
             term2=term2+x[i,j]
             term1 = term1+sin(x[i,j])
@@ -355,7 +355,7 @@ A["YATP1CLS"]=function yatp1cls(x::AbstractVector)
         term1 = -1
         term2 = -1
         for j = 1:N
-            term3 = x[i,j]^3-A*x[i,j]^2-x[i,j]*(y[i]+z[i])*cos(x[i,j])+sin(x[i,j])*(y[i]+z[i])
+            term3 = x[i,j]^3-A*x[i,j]^2-x[i,j]*(y[i]+z[j])*cos(x[i,j])+sin(x[i,j])*(y[i]+z[j])
             term1 = term1+sin(x[i,j])/x[i,j]
             term2 = term2+sin(x[i,j])/x[i,j]
             sum = sum + term3^2
@@ -931,22 +931,28 @@ function meyer3(x::AbstractVector)
     return sum#, grad
 end
 
-function luksan13ls(x::AbstractVector)
+A["LUKSAN13LS"]=function luksan13ls(x::AbstractVector)
     #println("Julia port of CUTEST's LUKSAN13LS")
     grad = zeros(size(x))
     sum = 0
-    S = convert(Int64,(length(x)-2)/3)
+    S = 32
+    N=3*S+2
+    E=zeros(eltype(x),N^2)
     i=1
+    k=1
     for j = 1:S
-      term = -10*x[i+1]+10*x[i]^2
-      term1 = -10*x[i+2]+10*x[i+1]^2
-      term2 = (x[i+2]-x[i+3])^2
-      term3 = (x[i+3]-x[i+4])^2
-      term4 = x[i]+x[i+2]-30+x[i]^2
-      term5 = x[i+1]+x[i+3]-10-x[i+2]^2
-      term6 = -10+x[i]*x[i+4]
-      sum = sum +term^2+ term1^2+term2^2+term3^2+term4^2+term5^2+term6^2
+      E[k] = -10*x[i+1]+10*x[i]^2
+      E[k+1] = -10*x[i+2]+10*x[i+1]^2
+      E[k+2] = (x[i+2]-x[i+3])^2
+      E[k+3] = (x[i+3]-x[i+4])^2
+      E[k+4] = x[i]+x[i+2]-30+x[i]^2
+      E[k+5] = x[i+1]+x[i+3]-10-x[i+2]^2
+      E[k+6] = -10+x[i]*x[i+4]
       i=i+3
+      k=k+7
+    end
+    for i=1:length(E)
+        sum=sum+E[i]^2
     end
     return sum#, grad
 end
