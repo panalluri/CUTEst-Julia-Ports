@@ -2,6 +2,7 @@
 # using NLPModels
 using ForwardDiff
 using SpecialFunctions
+using BenchmarkTools
 
 A = Dict{String,Function}()
 
@@ -19343,6 +19344,7 @@ end
 problemVector = collect(keys(A))
 xyz=rand(1:10,10^8)
 z=convert(Array{Float64},xyz)
+println(problemVector)
 
 B = Dict("OSCIGRAD"=>100000,"BOX3"=>3,"OSCIPATH"=>500,"BOX"=>10000,"BOXBODLS"=>2,"BOXPOWER"=>20000,"ENGVAL2"=>3,"ENGVAL1"=>5000,"ROSENBR"=>2,"SROSENBR"=>5000,"ROSENBRTU"=>2,"GENROSE"=>500,"POWER"=>10000,"FLETCHCR"=>1000,"EXTROSNB"=>1000,"ROSZMAN1LS"=>4,"DIXMAANI"=>3000,"LIARWHD"=>5000,"SCHMVETT"=>5000,"LUKSAN13LS"=>98,"JUDGE"=>2,"NONDIA"=>5000,"DIXMAANJ"=>3000,"DIXMAANC"=>3000,"DIXMAANL"=>3000,"DIXMAANK"=>3000,"DIXMAANG"=>3000,"DIXMAANF"=>3000,"DIXMAANE"=>3000,"DIXMAANP"=>3000,"DIXMAANH"=>3000,"DIXMAANB"=>3000,"DIXMAANN"=>3000,"DIXMAANA"=>3000,"DIXMAANO"=>3000,"DIXMAANM"=>3000,"DIXMAAND"=>3000,"SINVALNE"=>2,"COSINE"=>10000,"SSCOSINE"=>5000,"SINEVAL"=>2,"MUONSINELS"=>1,"SCOSINE"=>5000,"SINQUAD"=>5000,"CLIFF"=>2,"EG2"=>1000,"EXP2"=>2,"CUBE"=>2,"GAUSSIAN"=>3,"HUMPS"=>2)
 C = Dict("LOGHAIRY"=>2,"QUARTC"=>5000,"TQUARTIC"=>5000,"NONDQUAR"=>5000,"QING"=>100,"SSI"=>3,"KSSLS"=>1000,"POWELLSG"=>5000,"POWELLBSLS"=>2,"POWELLSQLS"=>2,"WAYSEA2"=>2,"WAYSEA1"=>2,"PENALTY1"=>1000,"DQRTIC"=>5000,"BDQRTIC"=>5000,"DQDRTIC"=>5000,"WOODS"=>4000,"DANWOODLS"=>2,"DANIWOODLS"=>2,"ARGTRIGLS"=>200,"CURLY10"=>10000,"CURLY20"=>10000,"CURLY30"=>10000,"SCURLY30"=>10000,"SCURLY20"=>10000,"SCURLY10"=>10000,"BROWNAL"=>200,"BROWNBS"=>2,"BROWNDEN"=>4,"HELIX"=>3,"MEXHAT"=>2,"POWERSUM"=>4,"SPARSQUR"=>10000,"ELATVIDU"=>2,"LANCZOS3LS"=>6,"TRIGON2"=>10,"DENSCHNE"=>3,"MISRA1CLS"=>2,"PALMER4C"=>8,"CRAGGLVY"=>5000,"PALMER3C"=>8,"LANCZOS1LS"=>6,"CHNROSNB"=>50,"EDENSCH"=>2000,"RECIPELS"=>3,"EGGCRATE"=>2,"CHWIRUT1LS"=>3,"MGH10LS"=>3,"HATFLDGLS"=>25,"BARD"=>3,"ERRINROS"=>50,"HATFLDFLS"=>3,"MOREBV"=>5000,"ARGLINB"=>200,"HATFLDFL"=>3,"DEVGLA1"=>4)
@@ -19354,26 +19356,44 @@ B=merge!(B,F)
 G=Dict("LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETCHBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>8,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>4999,"HYDCAR6LS"=>29,"SPINLS"=>1327,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
 B=merge!(B,G)
 
-gIssue=["MOREBV"=>"no", "SSCOSINE"=>"no", "MEYER3"=>"no", "LUKSAN13LS"=>"no", "YATP2LS"=>"no", "YATP2CLS"=>"no", "YATP1LS"=>"no", "YATP1CLS"=>"no"]
+# gIssue=["MOREBV"=>"no", "SSCOSINE"=>"no", "MEYER3"=>"no", "LUKSAN13LS"=>"no", "YATP2LS"=>"no", "YATP2CLS"=>"no", "YATP1LS"=>"no", "YATP1CLS"=>"no"]
 
-function unitTesting(problemVector,gIssue,z)
-    for i = 1:length(A)
-        problem = problemVector[i]
-        if issubset([problem],gIssue) == false
-            lens=B[problem]
-            x=z[1:lens]
-            println("Julia port obj: "*problem)
-            sumPort = @btime A[problem](x)
-            println("Julia port grad: "*problem)
-            gradPort = @btime ForwardDiff.gradient(A[problem],x)
-            nlp = CUTEstModel(problem, verbose=false)
-            println("CUTEst obj: "*problem)
-            fx = @btime obj(nlp, x)
-            println("CUTEst grad: "*problem)
-            gx = @btime grad(nlp, x)
-            finalize(nlp)
-        end
+function myPorts(problemVector,z)
+    for i = 1:length(problemVector)
+      problem=problemVector[i]
+        lens=B[problem]
+        x=z[1:lens]
+        println("Julia port obj: "*problem)
+        f = A[problem]
+        Z = @btime $f($x)
+        println("Julia port grad: "*problem)
+        Y = @btime ForwardDiff.gradient($f,$x)
+        # nlp = CUTEstModel(problem, verbose=false)
+        # println("CUTEst obj: "*problem)
+        # fx = @btime obj($nlp, $x)
+        # println("CUTEst grad: "*problem)
+        # gx = @btime grad($nlp, $x)
+        # finalize(nlp)
     end
 end
 
-unitTesting(problemVector,gIssue,z)
+function CUTEstOld(problemVector,z)
+    for i = 1:length(problemVector)
+      problem=problemVector[i]
+        lens=B[problem]
+        x=z[1:lens]
+        # println("Julia port obj: "*problem)
+        # Z = @btime A[problem](x)
+        # println("Julia port grad: "*problem)
+        # Y = @btime ForwardDiff.gradient(A[problem],x)
+        nlp = CUTEstModel(problem, verbose=false)
+        println("CUTEst obj: "*problem)
+        fx = @btime obj($nlp, $x)
+        println("CUTEst grad: "*problem)
+        gx = @btime grad($nlp, $x)
+        finalize(nlp)
+    end
+end
+
+myPorts(problemVector,z)
+#CUTEstOld(problemVector,z)
