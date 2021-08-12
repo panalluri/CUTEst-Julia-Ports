@@ -1,9 +1,10 @@
 module JuliaCUTEstModule
 
-export CUTEstModel, vecLen, obj, grads
+export CUTEstModel, vecLen, obj, grad, tobj, tgrad
 
 using ForwardDiff
 using SpecialFunctions
+using BenchmarkTools
 
 A = Dict{String,Function}()
 
@@ -19397,12 +19398,43 @@ end
 function grad(prob,x)
     lens=B[prob]
     N = length(x)
-    if haskey(gIssue,prob) == true
+    if haskey(gIssue,prob) == false
         if lens != N
             println("input vector should be of length "*string(lens))
             return
         end
         gx = ForwardDiff.gradient(A[prob],x)
+        return gx
+    else
+        println("Gradient not supported for the specified function")
+    end
+end
+
+function tobj(prob,x)
+    lens=B[prob]
+    N = length(x)
+    if lens != N
+        println("input vector should be of length "*string(lens))
+        return
+    end
+    println("Julia port of "*prob)
+    f = A[prob]
+    println("Objective run time:")
+    fx = @btime $f($x)
+    return fx
+end
+
+function tgrad(prob,x)
+    lens=B[prob]
+    N = length(x)
+    if haskey(gIssue,prob) == false
+        if lens != N
+            println("input vector should be of length "*string(lens))
+            return
+        end
+        f = A[prob]
+        println("Gradient run time:")
+        gx = @btime ForwardDiff.gradient($f,$x)
         return gx
     else
         println("Gradient not supported for the specified function")
