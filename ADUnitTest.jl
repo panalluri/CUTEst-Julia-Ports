@@ -1,5 +1,5 @@
-# using CUTEst
-# using NLPModels
+using CUTEst
+using NLPModels
 using ForwardDiff
 using SpecialFunctions
 
@@ -19354,6 +19354,8 @@ B=merge!(B,F)
 G=Dict("LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETCHBV"=>5000,"LUKSAN11LS"=>100,"LUKSAN17LS"=>100,"LUKSAN15LS"=>100,"FLETCBV3"=>5000,"SPARSINE"=>5000,"FLETCBV2"=>5000,"STREG"=>4,"PENALTY3"=>200,"DJTL"=>2,"EIGENCLS"=>51*52,"CERI651CLS"=>7,"VIBRBEAM"=>8,"CERI651ALS"=>7,"DIAMON2DLS"=>66,"DEVGLA2NE"=>5,"CERI651DLS"=>7,"EIGENALS"=>50*51,"EIGENBLS"=>50*51,"MSQRTBLS"=>32^2,"LANCZOS2LS"=>6,"BENNETT5LS"=>3,"SPMSRTLS"=>4999,"HYDCAR6LS"=>29,"SPINLS"=>1327,"HEART8LS"=>8,"HEART6LS"=>6,"DIAMON3DLS"=>99,"CERI651BLS"=>7,"PENALTY2"=>200,"FMINSRF2"=>100^2,"FMINSURF"=>75^2,"COOLHANSLS"=>9,"VAREIGVL"=>4999,"CERI651ELS"=>7,"SSBRYBND"=>5000,"BRYBND"=>5000,"GBRAINLS"=>11*200,"MANCINO"=>100,"NONMSQRT"=>70^2,"BROYDNBDLS"=>5000,"BROYDN3DLS"=>5000,"BROYDN7D"=>5000,"NONCVXU2"=>5000,"NELSONLS"=>3,"YFITU"=>3,"COATINGNE"=>134,"YATP1CLS"=>350*352,"YATP2LS"=>350*352,"YATP2CLS"=>350*352,"HILBERTA"=>2,"YATP1LS"=>350*352,"HILBERTB"=>10,"WATSON"=>12,"DIXON3DQ"=>10000,"CHAINWOO"=>4000,"KIRBY2LS"=>5,"COATING"=>134,"ERRINRSM"=>50,"DEVGLA2"=>5)
 B=merge!(B,G)
 
+problemVector = ["GENROSE", "EXTROSNB", "POWER", "FLETCHCR", "OSCIGRAD", "MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS", "YATP2LS", "YATP2CLS", "YATP1LS", "YATP1CLS"]
+
 function unitTesting(problemVector,z)
     for i = 1:length(A)
         problem = problemVector[i]
@@ -19388,14 +19390,91 @@ function unitTesting(problemVector,z)
     end
 end
 
-#gradient failures: "MSQRTBLS", "NONMSQRT", "YATP2LS", "LUKSAN15LS",
-# "YATP2CLS", "EIGENALS", "YATP1LS", "LUKSAN11LS", "YATP1CLS",
-# "LUKSAN16LS", "SPMSRTLS", "FMINSURF", "VIBRBEAM", "EIGENBLS",
-# "DJTL", "LUKSAN17LS", "EIGENCLS", "SPINLS"
+function unitTestGrads(problemVector,z)
+    for i = 1:length(problemVector)
+        problem = problemVector[i]
+        lens=B[problem]
+        x=z[1:lens]
+        println("Working on: "*problem)
+        nlp = CUTEstModel(problem, verbose=false)
+        gx = grad(nlp, x)
+        finalize(nlp)
+        gradCUTEst = convert(Array{Float64},gx)
+        gradPort = ForwardDiff.gradient(A[problem],x)
+        gErr=0
+        println("Abs err:")
+        grad1 = abs.(gradPort-gradCUTEst)
+        println("inf norm: "*string(maximum(grad1)))
+        gradSq = sqrt(sum(grad1.^2))
+        println("2 norm: "*string(gradSq))
 
-# gradient errors: "MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS"
+        println("Diff vec scaled by maximum:")
+        grad1 = (1/maximum(gradCUTEst))*abs.(gradPort-gradCUTEst)
+        println("inf norm: "*string(maximum(grad1)))
+        gradSq = sqrt(sum(grad1.^2))
+        println("2 norm: "*string(gradSq))
 
-gIssue=["MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS", "MSQRTBLS", "NONMSQRT", "YATP2LS", "LUKSAN15LS", "YATP2CLS", "EIGENALS", "YATP1LS", "LUKSAN11LS", "YATP1CLS", "LUKSAN16LS", "SPMSRTLS", "FMINSURF", "VIBRBEAM", "EIGENBLS", "DJTL", "LUKSAN17LS", "EIGENCLS", "SPINLS"]
+        println("Point-wise err:")
+        sum1=0
+        sum2=0
+        for j=1:lens
+            for k=1:lens
+                if max(gradCUTEst[j,k],gradPort[j,k]) != 0
+                    a = (1/max(gradCUTEst[j,k],gradPort[j,k]))*abs.(gradPort[j,k]-gradCUTEst[j,k])
+                    sum1 = max(sum1,a)
+                    sum2 = sum2 + a^2
+                end
+            end
+        end
+        println("inf norm: "*string(sum1))
+        gradSq = sqrt(sum2)
+        println("2 norm: "*string(gradSq))       
+    end
+end
+
+function unitTestSumz(problemVector,z)
+    for i = 1:length(problemVector)
+        problem = problemVector[i]
+        lens=B[problem]
+        x=z[1:lens]
+        temp=A[problem](x)
+        sumPort=temp
+        println("Working on: "*problem)
+        nlp = CUTEstModel(problem, verbose=false)
+        fx = obj(nlp, x)
+        finalize(nlp)
+        sumCUTEst = convert(Float64,fx)
+        gErr=0
+        println("Abs err:")
+        sumz1 = abs(sumPort-sumCUTEst)
+        println("inf norm: "*string(maximum(sumz1)))
+        sumSq = sqrt(sumz1^2)
+        println("2 norm: "*string(sumSq))
+
+        println("Diff vec scaled by maximum:")
+        sumz1 = (1/maximum(sumCUTEst))*abs(sumPort-sumCUTEst)
+        println("inf norm: "*string(maximum(sumz1)))
+        sumSq = sqrt(sumz1^2)
+        println("2 norm: "*string(sumSq))
+
+        println("Point-wise err:")
+        sum1=0
+        sum2=0
+        if max(sumCUTEst,sumPort) != 0
+            a = (1/max(sumCUTEst,sumPort))*abs.(sumPort-sumCUTEst)
+            sum1 = max(sum1,a)
+            sum2 = sum2 + a^2
+        end
+        println("inf norm: "*string(sum1))
+        sumSq = sqrt(sum2)
+        println("2 norm: "*string(sumSq))       
+    end
+end
+
+# gradient errors: "MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS", "YATP1LS", "YATP1CLS", "YATP2LS", "YATP2CLS"
 
 #unitTesting(problemVector,z)
+unitTestGrads(problemVector,z)
+unitTestSumz(problemVector,z)
+
 println(problemVector)
