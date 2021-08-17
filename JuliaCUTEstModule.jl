@@ -1,6 +1,6 @@
 module JuliaCUTEstModule
 
-export CUTEstModel, vecLen, obj, grad, tobj, tgrad
+export CUTEstModel, vecLen, obj, grad, hess, tobj, tgrad, thess
 
 using ForwardDiff
 using SpecialFunctions
@@ -19438,6 +19438,38 @@ function tgrad(prob,x)
         return gx
     else
         println("Gradient not supported for the specified function")
+    end
+end
+
+function hess(prob,x)
+    lens=B[prob]
+    N = length(x)
+    if haskey(gIssue,prob) == false
+        if lens != N
+            println("input vector should be of length "*string(lens))
+            return
+        end
+        hx = ForwardDiff.hessian(A[prob],x)
+        return hx
+    else
+        println("Hessian not supported for the specified function")
+    end
+end
+
+function thess(prob,x)
+    lens=B[prob]
+    N = length(x)
+    if haskey(gIssue,prob) == false
+        if lens != N
+            println("input vector should be of length "*string(lens))
+            return
+        end
+        f = A[prob]
+        println("Hessian run time:")
+        hx = @btime ForwardDiff.hessian($f,$x)
+        return hx
+    else
+        println("Hessian not supported for the specified function")
     end
 end
 
