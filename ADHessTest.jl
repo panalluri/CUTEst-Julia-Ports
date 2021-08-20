@@ -3,6 +3,7 @@ using NLPModels
 using ForwardDiff
 using SpecialFunctions
 using LinearAlgebra
+using SparseArrays
 
 A = Dict{String,Function}()
 
@@ -19356,77 +19357,63 @@ G=Dict("LUKSAN16LS"=>100,"HYDC20LS"=>99,"METHANB8LS"=>31,"METHANL8LS"=>31,"FLETC
 B=merge!(B,G)
 
 problemVector = ["GENROSE", "EXTROSNB", "POWER", "FLETCHCR", "OSCIGRAD", "MOREBV", "SSCOSINE", "MEYER3", "LUKSAN13LS", "YATP2LS", "YATP2CLS", "YATP1LS", "YATP1CLS"]
+problemVector = ["BEALE"]
 
 function unitTesting(problemVector,z)
     for i = 1:length(problemVector)
         problem = problemVector[i]
         lens=B[problem]
         x=z[1:lens]
+        hessPort = spzeros(length(x),length(x))
         println("Working on: "*problem)
         nlp = CUTEstModel(problem, verbose=false)
         hx = hess(nlp, x)
         finalize(nlp)
         hessCUTEst = convert(Array{Float64},hx)
-        hessPort = ForwardDiff.hessian(A[problem],x)
+        f=A[problem]
+        for j = 1:length(x)
+            for k=1:length(x)
+                t1s = ForwardDiff.Dual{Nothing,Float64, 1}
+                t2s = ForwardDiff.Dual{Nothing,t1s, 1}
+                seed = zeros(length(x))
+                seed[j]=1
+                dx = ForwardDiff.Dual.(x, seed)
+                y = f(dx)
+                w = ForwardDiff.partials.(y)
+                seed2 = zeros(length(x))
+                seed2[k] = 1
+                ddx = ForwardDiff.Dual.(dx, seed2)
+                c = f(ddx)
+                v = ForwardDiff.partials.(c)
+                hessPort[j,k] = v.values[1].partials.values[1]
+            end
+        end
         hErr=0
         if issymmetric(hessPort) == false
-            println("Abs err:")
-            hess1 = abs.(hessPort-hessCUTEst)
-            println("inf norm: "*string(maximum(hess1)))
-            hessSq = sqrt(sum(hess1.^2))
-            println("2 norm: "*string(hessSq))
-
-            println("Diff matrix scaled by maximum:")
-            hess1 = (1/maximum(hessCUTEst))*abs.(hessPort-hessCUTEst)
-            println("inf norm: "*string(maximum(hess1)))
-            hessSq = sqrt(sum(hess1.^2))
-            println("2 norm: "*string(hessSq))
-
-            println("Point-wise err:")
-            sum1=0
-            sum2=0
             for j=1:lens
                 for k=1:lens
-                    if max(hessCUTEst[j,k],hessPort[j,k]) != 0
-                        a = (1/max(hessCUTEst[j,k],hessPort[j,k]))*abs.(hessPort[j,k]-hessCUTEst[j,k])
-                        sum1 = max(sum1,a)
-                        sum2 = sum2 + a^2
+                    a = (1/max(hessCUTEst[j,k],hessPort[j,k]))*abs.(hessPort[j,k]-hessCUTEst[j,k])
+                    if a>=10^(-3) 
+                        hErr=1
                     end
                 end
             end
-            println("inf norm: "*string(sum1))
-            hessSq = sqrt(sum2)
-            println("2 norm: "*string(hessSq))
+            if hErr==1
+                println("ouch: "*problemVector[i])
+            end
         else 
-            hessPortU = triu(hessPort)
             hessPortL = tril(hessPort)
-            println("Abs err:")
-            hess1 = abs.(hessPortL-hessCUTEst)
-            println("inf norm: "*string(maximum(hess1)))
-            hessSq = sqrt(sum(hess1.^2))
-            println("2 norm: "*string(hessSq))
-
-            println("Diff matrix scaled by maximum:")
-            hess1 = (1/maximum(hessCUTEst))*abs.(hessPortL-hessCUTEst)
-            println("inf norm: "*string(maximum(hess1)))
-            hessSq = sqrt(sum(hess1.^2))
-            println("2 norm: "*string(hessSq))
-
-            println("Point-wise err:")
-            sum1=0
-            sum2=0
             for j=1:lens
                 for k=1:lens
-                    if max(hessCUTEst[j,k],hessPortL[j,k]) != 0
-                        a = (1/max(hessCUTEst[j,k],hessPortL[j,k]))*abs.(hessPortL[j,k]-hessCUTEst[j,k])
-                        sum1 = max(sum1,a)
-                        sum2 = sum2 + a^2
+                    a = (1/max(hessCUTEst[j,k],hessPortL[j,k]))*abs.(hessPortL[j,k]-hessCUTEst[j,k])
+                    if a>=10^(-3) 
+                        hErr=1
                     end
                 end
-            end
-            println("inf norm: "*string(sum1))
-            hessSq = sqrt(sum2)
-            println("2 norm: "*string(hessSq))            
+            end   
+            if hErr==1
+                println("ouch: "*problemVector[i])
+            end  
         end
     end
 end
